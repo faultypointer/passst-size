@@ -1,11 +1,10 @@
 # On every push this script is executed
 name: Zola on GitHub Pages
 
-on:
-  workflow_run:
-    workflows: ["Fetch Webmentions"]
-    types:
-      - completed
+on: 
+ push:
+  branches:
+   - main
 
 jobs:
   build:
@@ -18,3 +17,4 @@ jobs:
       uses: shalzz/zola-deploy-action@v0.19.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

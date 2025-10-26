@@ -1,9 +1,9 @@
-base_url = "https://flux.carboxi.de"
+base_url = "https://faulty.carboxi.de"
 
 # about me
-author ="flux"
-title = "flux:carboxide"
-description = "Just a flow of carbons and oxygens in my body."
+author ="faulty"
+title = "faulty:carboxide"
+description = "something something nitrogen"
 
 # disable sass and search index
 compile_sass = false
@@ -25,7 +25,7 @@ highlight_theme = "base16-ocean-light"
 
 # extra stuff
 [extra]
-url = "flux.carboxi.de"
-email = "flux@carboxi.de"
+url = "faulty.carboxi.de"
+email = "faultypointer@proton.me"
 profile = "/thumbnail.png"
-note = "There is nothing to know about me. I don't matter. What matters is what I write, and I write to know how I am evolving over time."
+note = "book"
