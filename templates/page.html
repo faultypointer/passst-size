@@ -16,7 +16,7 @@
     <h1 class="p-name"><a href="{{ config.base_url }}">{{ page.title }}</a></h1>
 
         <div class="e-content p-content">
-            {% set content = page.content | replace(from="[", to='<em class="inner-voice">') | replace(from="]", to="</em>") %}
+            {% set content = page.content | replace(from="[<em>", to='<em class="inner-voice">') | replace(from="</em>]", to="</em>") %}
             {{ content | safe }}
         </div>
 

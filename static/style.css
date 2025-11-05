@@ -38,7 +38,7 @@
 }
 
 * {
-  --column-width: 70ch;
+  --column-width: 100ch;
   --font-family:"Libertinus", P052, serif;
   --font-family-sans:system-ui, sans-serif;
   --font-family-mono:ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace;
@@ -109,6 +109,15 @@ pre {
   overflow: auto;
   padding: 0.25rem 1rem;
 }
+
+pre, code {
+  background-color: #15161A !important;
+  color: #EAF0F5;
+  border-radius: 0.4rem;
+  padding: 0.75rem 1rem;
+  font-family: var(--font-family-mono);
+}
+
 
 body > section > h1:nth-child(1) {
   margin-top: 2.5rem;

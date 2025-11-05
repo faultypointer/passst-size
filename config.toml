@@ -15,13 +15,14 @@ generate_feeds = true
 
 # enable tags
 taxonomies = [
-    {name = "tags", output = false}
+    {name = "tags", output = true}
 ]
 
 # enable code highlighting
 [markdown]
 highlight_code = true
-highlight_theme = "nord"
+highlight_theme = "highlight"
+extra_syntaxes_and_themes = ["static"]
 
 # extra stuff
 [extra]
