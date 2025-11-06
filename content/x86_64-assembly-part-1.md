@@ -1,18 +1,19 @@
 +++
 title = "Into the x86_64 land"
-date = 2025-11-05
-draft = true
+date = 2025-11-06
+# draft = true
 [taxonomies]
 tags = ["x86_64", "assembly"]
 +++
-We are going to learn assembly programming, more specifically x86_64 assembly. Why? Because that's the architecture my machine uses. As to Why
-learn assembly in the fisrt place, I have no answer to that. So let's get right into it.
+We are going to learn assembly programming, more specifically x86_64 assembly. Why? Because that's the architecture my machine uses. As to why I decided to
+learn assembly in the first place, I have no answer to that. So let's get right into it.
 
 ## But First
 
 We need (imagine a drumroll here that is ..................... this long)*the setup*. We need assembler that can convert the assembly source into
-machine code that can be executed. There are many assembler in the market: [nasm](https://www.nasm.us/), [gas](https://en.wikipedia.org/wiki/GNU_Assembler) and
+machine code that can be executed. There are many assemblers in the market: [nasm](https://www.nasm.us/), [gas](https://en.wikipedia.org/wiki/GNU_Assembler) and
 many others. I've decided to go with nasm because it uses intel syntax which I like over the AT&T syntax.
+The assembler outputs an object file and to convert it to an executable, we need a linker as well.
 
 We also probably need a debugger for which we have [gdb](https://sourceware.org/gdb/).
 
@@ -28,26 +29,29 @@ We need to have a general understanding of the x86_64 architecture before we wri
 
 I assume you know what registers are. If not tough luck.
 
-There are 16 general purpose registers (GPR) in x86_64: RAX, RBX, RCX, RDX, RDI, RSI, RBP, RSP, R8-R15. You can use the lower 32-bit of these registers when working with 32-bit values.
-In such case, you can use specify them using: EBX, ECX, EDX, EDI, ESI, EBP, ESP, R8D-R15D. There are also 16-bit and 8-bit variants with naming AX, BX, ... R8W-R15W for 16-bit and
+There are 16 general purpose registers (GPR) in x86_64: RAX, RBX, RCX, RDX, RDI, RSI, RBP, RSP, R8-R15. You can also use the lower 32-bit of these registers when working with 32-bit values.
+In such case, you can use specify them using: EBX, ECX, EDX, EDI, ESI, EBP, ESP, R8D-R15D. There are also 16-bit and 8-bit variants with names AX, BX, ... R8W-R15W for 16-bit and
 AL, BL, ... R8B-R15B for 8-bit ones.
-*The D here mean doubleword, W means word and B means byte.*
+*The D here means doubleword, W means word and B means byte.*
 
-There are other registers as well for example flag registers, simd registers but we will not be taking about them now.
+There are other registers as well for example flag registers and simd registers but we will not be talking about them now.
 
 ### Calling Convention
 
-I am not going to explain about calling conventions now because I expect you to know what they are [*and its totally not because I am not confident about my explanation*]. All I'm goind to say is
-that calling convention are a set of rules followed by programs mostly about where to put arguments to a function. The convention vary based not only on architecture and os but also based on
+I am not going to explain about calling conventions now because I expect you to know what they are [*and its totally not because I am not confident about my explanation*]. All I'm going to say is
+that calling convention are a set of rules followed by programs mostly about where to put arguments to a function. The convention vary based not only on architecture and OS but also based on
 compilers as well. The calling convention we will follow is the one used by many c compilers for my system described [here](https://refspecs.linuxbase.org/elf/x86_64-abi-0.99.pdf#section.3.2).
 
-- the parameters are passed in registers rdi, rsi, rdx, rcx, r8, r9. floating point parameters in xmm0 to xmm7
-- additional parameters that don't fit in those registers are passed in stack
-- the registers rbx, rsp, rbp, r12-r15 are callee-saved, while the rest of the registers are caller-saved
-- so if a function wants to call another function and it has some value in caller preserved registers it wants after the function call, it should save those value before calling another function
-- all floating point registers are caller preserved
-- return values are stores in rax (or rdx:rax when necessary) or xmm0 (or xmm1:xmm0) for floating points
-- if the return type doesn't fit in rdx:rax, the caller must pass pointer to the storage to where the return value should be placed in register rdi. the callee must return the same poiner in rax
+- The parameters are passed in registers rdi, rsi, rdx, rcx, r8, r9. Floating point parameters in xmm0 to xmm7
+- Additional parameters that don't fit in those registers are passed in stack
+- The registers rbx, rsp, rbp, r12-r15 are callee-saved, while the rest of the registers are caller-saved
+- So if a function wants to call another function and it has some value in caller preserved registers it wants after the function call, it should save those value before calling another function
+- All floating point registers are caller preserved
+- Return values are stores in rax (or rdx:rax when necessary) or xmm0 (or xmm1:xmm0) for floating points
+- If the return type doesn't fit in rdx:rax, the caller must pass pointer to the storage to where the return value should be placed in register rdi. the callee must return the same poiner in rax
+
+Lets see it in action. Below is a piece of c code that defines two function. The `threesum` function takes three `int` arguments `a, b, c`. The next function takes two integer arguments, one float and
+another integer argument.
 
 ```c
 int threesum(int a, int b, int c) {
@@ -58,6 +62,8 @@ float very_imp_function(int a, int b, float c, int d) {
   return a + b + d + (float)c;
 }
 ```
+
+If we compile this code (`gcc -c filename`) and disassemble the object file (`objdump -dC --no-show-raw-insn object-file`), we see the following output:
 
 ```asm
 0000000000000000 <threesum>:
@@ -75,24 +81,37 @@ float very_imp_function(int a, int b, float c, int d) {
   19: ret
 ```
 
-## I think it is time
+According to the calling convention, the arguments of threesum should go into register `rdi`, `rsi` and `rdx`. Since the are `int`s(32-bit), we see the edi, esi and eax. The first line
+adds the parameters `a` and `b` together and stores it in `edi`. The second line uses `lea` to compute the sum of `rdi`(a+b) and `rdx`(c) and store it in `eax` in one go instead of
+doing an `add` and `mov`.
+
+To be honest, I don't understand most of the instruction used in the `very_imp_function` but we can see that it atleast follows the calling convention. The first two arguments
+go in register `edi` and `esi`. The float argument goes into the `xmm0` register and the final int argument goes into the next register from the convention sequence that is free: `edx`.
+
+This would have been more clear if we would have defined another function that calls these two functions but I already wrote this line and I don't want to delete it so try to do it
+as a homework.
+
+## It is time
 
 We are gonna write hello world in assembly. We still don't have complete knowledge about how to print "Hello World" in the terminal using x86_64 assembly. But we are gonna figure those
 things out as we go.
 
-First of all, we need a place to write the assmebly code. Since we are using nasm, create a file called with `.nasm` extention [*which isn't necessary but cmon*].
+First of all, we need a place to write the assembly code. Since we are using nasm, create a file with a `.nasm` extension [*which isn't necessary but cmon*].
 
-Like c or any other compiled language, if we are going to make out program an executable, we need to provide it with an entry point. The linked we will later use (`ld`) to convert out
-object file to an executable expects the entry point to be `_start` by default. So lets define a _start entry point in out program.
+The general form of each nasm source code line is: `label:    instruction operands        ; comment`. You probably know what these mean so I won't bother explaining them.
+
+Like c or any other compiled language, if we are going to make our program an executable, we need to provide it with an entry point. The linker we will later use (`ld`) to convert our
+object file to an executable expects the entry point to be `_start` by default. So let's define a _start entry point in out program. An entry point is basically the location from where
+the executable start to run code.
 
 ```asm
 _start:
   ; I don't know any instruction yet!!
 ```
 
-Now how can we write things to our terminal. If we were using c, we would probably call `printf` and pass the string "Hello, World" to that function. But we are doing assembly so we can't use printf. Or can we?
+Now, how do we write things to our terminal. If we were using c, we would probably call `printf` and pass the string "Hello, World" to that function. But we are doing assembly so we can't use printf. Or can we?
 We absolutely can, but that is a topic for future part. Today we are getting a small taste of syscalls. In linux, there is a syscall for writing to a file descriptor called `write`. You can read about it in details using man pages: `man 2 write`.
-It has the following defination:
+It has the following definition:
 
 ```c
 ssize_t write(int fd, const void buf[count], size_t count);
@@ -101,10 +120,10 @@ ssize_t write(int fd, const void buf[count], size_t count);
 So it expects a file descriptor as its first argument, buffer from which to write to the file as second argument, and the total bytes from buffer to write. It returns the number of bytes
 actually written on success (which may be less than the `count` passed as argument). On failure, it returns -1;
 
-### But how do we actuall invoke the system call
+### But how do we actually invoke the system call
 
 The instruction to invoke a syscall in assembly is rightly named `syscall` which takes no operands. There isn't a single system call so how does one let the os know which system call I
-want to invoke is? [*BTW if you are wondering how many syscall are there in linux for x86_64 architecture, the answer is too many.*]
+want to invoke is?
 
 This is basically the steps required to invoke a syscall using assembly:
 
@@ -153,7 +172,7 @@ The `equ` defines a symbol (in this case `length`) to a given constant value. Th
 
 If you were reading extra carefully, you might have noticed that an instruction changed in the above program. The `mov rsi, message` changed to `lea rsi, message`.
 
-For this program, both instruction does the same thing but they are very different. We will get to those two and other instructions in a bit, but first lets assemble and link our program.
+For this program, both instructions do the same thing but they are very different. We will get to those two and other instructions in a bit, but first lets assemble and link our program.
 
 To compile the program with nasm, we can run the following command:
 
@@ -165,7 +184,7 @@ This creates an object file called `hello.o` which we can link using the linker 
 
 No need to worry. It is just a warning saying it can't find the entry point `_start` (which is default for `ld`). You may be thinking, "What is `ld` smoking and can I get some too? I have defined the `_start` right there in the program". We still need to export it so that `ld` can see the thing. That is the work of the `global` directive.
 
-We have finally completed the hello world in assembly. Lets us also exit from the program using `exit` syscall because why not?
+We have finally completed the hello world in assembly. Let's also exit from the program using `exit` syscall because why not?
 
 ```asm
 section .data
@@ -226,7 +245,7 @@ Speaking of
 ### Flags
 
 The RFLAGS register is a 64 register with its upper 32 bits reserved. The lower 32 bits contain groups of status, control and system flags.
-The only flags we need to care about for now [*well we don't really need to care about any in this part*] are the following:
+The only flags we need to care about for now [*well we don't really need to care about any of them in this part*] are the following:
 
 - Carry Flag: set if arithmetic operation generates a carry or a borrow out of MSB, cleared otherwise
 - Zero Flag: set if the result is zero, cleared otherwise
@@ -242,15 +261,15 @@ There is also an unconditional jump(`jmp`) that just jumps to the instruction at
 
 ## Cryptographically Secure Random Number Generator
 
-So, how are we gonna be doing this? If you expected some actual algorithms like [cha cha slide](https://en.wikipedia.org/wiki/Salsa20#ChaCha_variant) or xoshiro(<https://en.wikipedia.org/wiki/Xorshift>) or any other then be ready to be disappointed.
+So, how are we gonna be doing this? If you expected some actual algorithms like [cha cha slide](https://en.wikipedia.org/wiki/Salsa20#ChaCha_variant) or [xoshiro](https://en.wikipedia.org/wiki/Xorshift#xoshiro) or any other then be ready to be disappointed.
 Or you can take this as an opportunity and implement those algorithm in assembly yourself. For now, we are gonna do things simple.
-What we will do is read few bytes from "/dev/urandom". We also don't have anything that can use that random number so we will just print it.
+What we will do is read few bytes from "/dev/urandom". We also don't have anything that can use the random number so we will just print it.
 
 Let me outline what exactly what we will do. Maybe you can try to do it yourself before looking at the code.
 
 - we need to open the file "/dev/urandom" using the `open` syscall
 - use the fd returned by `open` to read the bytes to some memory location
-- write the random (probably with some accompaning text) to standard out
+- write the random (probably with some accompanying text) to standard out
 
 About that last point, we could write a simple function to convert the integer to ascii so that write can print it out but again we haven't touched loops yet so we lets opt out for something simpler.
 
