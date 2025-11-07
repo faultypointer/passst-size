@@ -148,7 +148,7 @@ _start:
 Now we need a buffer storing the message (Hello World) that we want to print. To do that we need to learn a little bit about nasm and its program structure. The program is divided into sections. The `.text` section contains the code, the `.data` section
 contains the initialized data. There are also `.bss` and `.rodata` section for allocating uninitialized space and for defining constant data respectively.
 
-You can use [pseudo instructions](https://nasm.us/docs/3.01/nasm03.html#section-3.2) to declate initialized and uninitialized data.
+You can use [pseudo instructions](https://nasm.us/docs/3.01/nasm03.html#section-3.2) to declare initialized and uninitialized data.
 
 With this, we are one step closer to printing hello world.
 
@@ -187,6 +187,7 @@ No need to worry. It is just a warning saying it can't find the entry point `_st
 We have finally completed the hello world in assembly. Let's also exit from the program using `exit` syscall because why not?
 
 ```asm
+global _start
 section .data
   message: db "Hello World", 10
   len: equ $ - message
@@ -251,8 +252,8 @@ The only flags we need to care about for now [*well we don't really need to care
 - Zero Flag: set if the result is zero, cleared otherwise
 - Signed Flag: equal to the MSB of result
 
-The condition jump instruction uses those flags to jump to speficied location based on some condition.
-There are different kinds of conditional jumps and they are ofter used with `cmp` to jump to an instruction in some location based on
+The condition jump instruction uses those flags to jump to specified location based on some condition.
+There are different kinds of conditional jumps and they are often used with `cmp` to jump to an instruction in some location based on
 the ordering of two values.
 For example, `JE`: jump if zero flag is equal to zero. (so when used after `cmp` if two operands were equal)
 You can check out all the conditional jump instructions [here](https://www.felixcloutier.com/x86/jcc).
