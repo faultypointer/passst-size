@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="logs">
+  <h1 class="p-name"><a href="{{ config.base_url }}">#{{ term.name }}</a></h1>
+
+  <section>
+    {% set prev_year = "" %}
+    {% set prev_month = "" %}
+    
+    {% for page in term.pages %}
+      {% set iter_year = page.date | date(format="%Y") %}
+      {% set iter_month = page.date | date(format="%B") %}
+      
+      {# Display year and month header #}
+      {% if iter_year != prev_year or iter_month != prev_month %}
+        <div class="date-header">
+          {% if iter_year != prev_year %}
+            <span class="year-header">{{ iter_year }}</span>
+            {% set_global prev_year = iter_year %}
+          {% else %}
+            <span></span>
+          {% endif %}
+          {% if iter_month != prev_month %}
+            <span class="month-header">{{ iter_month }}</span>
+            {% set_global prev_month = iter_month %}
+          {% endif %}
+        </div>
+      {% endif %}
+      
+      {% set day = page.date | date(format='%d') | trim_start_matches(pat='0') %}
+      {% set suffix = "th" %}
+      {% if day == "1" or day == "21" or day == "31" %}
+        {% set suffix = "st" %}
+      {% elif day == "2" or day == "22" %}
+        {% set suffix = "nd" %}
+      {% elif day == "3" or day == "23" %}
+        {% set suffix = "rd" %}
+      {% endif %}
+      
+      <article class="listing">
+        <a href="{{ page.permalink | safe }}">{{ page.title }}</a>
+        <span class="separator"></span>
+        <time datetime="{{ page.date | date(format='%Y-%m-%d') }}">
+          {{ day }}<sup>{{ suffix }}</sup>
+        </time>
+      </article>
+    {% endfor %}
+  </section>
+</div>
+{% endblock content %}

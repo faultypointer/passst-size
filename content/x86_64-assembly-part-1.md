@@ -1,9 +1,8 @@
 +++
 title = "Into the x86_64 land"
 date = 2025-11-06
-# draft = true
 [taxonomies]
-tags = ["x86_64", "assembly"]
+tags = ["x86_64", "assembly", "into-x86_64-land"]
 +++
 We are going to learn assembly programming, more specifically x86_64 assembly. Why? Because that's the architecture my machine uses. As to why I decided to
 learn assembly in the first place, I have no answer to that. So let's get right into it.

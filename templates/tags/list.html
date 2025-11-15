@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="p-name"><a href="{{ config.base_url }}">A total of {{ terms | length }} Tags.</a></h1>
+
+<b><span> • </span></b>
+{% for tag in terms %}
+<a href="{{ get_taxonomy_url(kind='tags', name=tag.name) }}"><b>{{tag.name}} <sup>{{ tag.pages | length }}</sup></a><span> • </span></b>
+{% endfor %}
+
+{% endblock content %}

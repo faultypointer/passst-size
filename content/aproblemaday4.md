@@ -2,7 +2,7 @@
 title = "A problem a day: Day 4"
 date = 2025-02-24
 [taxonomies]
-tags = ["algorithm"]
+tags = ["algorithm", "a-problem-a-day"]
 +++
 
 

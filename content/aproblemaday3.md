@@ -2,7 +2,7 @@
 title = "A problem a day: Day 3"
 date = 2025-02-23
 [taxonomies]
-tags = ["algorithm"]
+tags = ["algorithm", "a-problem-a-day"]
 +++
 
 ## Origin

@@ -1,7 +1,7 @@
 {% macro next() %}
   <section class="next">
       <h2>Wondering?</h2>
-      <div><p>Maybe explore my archives and send me a <a href="https://indieweb.org/Webmention">webmention</a>. Follow the site using <a href="{{ get_url(path="rss.xml", trailing_slash=false) }}">RSS</a>. Send me your blog and I’ll read it. <em class="inner-voice">That is, if you know how to contact me. :p</em></p></div>
+      <div><p>Maybe explore my <a href="/tags">tags</a> & archives and send me a <a href="https://indieweb.org/Webmention">webmention</a>. Follow the site using <a href="{{ get_url(path="rss.xml", trailing_slash=false) }}">RSS</a>. Just roam arount a bit.</p></div>
   </section>
 {% endmacro next %}
 
@@ -24,7 +24,11 @@
 {# First pass: check if there are any webmentions for this page #}
 {% for links in data.links %}
     {% set trimmed_path = links.target | trim_start_matches(pat="https://" ~ config.extra.url ~ "/") | trim_end_matches(pat="/") %}
-    {% set relative_path = trimmed_path ~ ".md" %}
+    {% if trimmed_path == "" %}
+        {% set relative_path = "_index.md" %}
+    {% else %}
+        {% set relative_path = trimmed_path ~ ".md" %}
+    {% endif %}
     {% set target_page = get_page(path=relative_path) %}
     {% if not links.source is starting_with("https://" ~ config.extra.url) %}
       {% if links.target == page.permalink %}
@@ -38,11 +42,14 @@
 <div id="webmention" class="next">
 <hr>
 <h2>Nexus</h2>
-
 <div class="interaction-box">
 {% for links in data.links %}
     {% set trimmed_path = links.target | trim_start_matches(pat="https://" ~ config.extra.url ~ "/") | trim_end_matches(pat="/") %}
-    {% set relative_path = trimmed_path ~ ".md" %}
+    {% if trimmed_path == "" %}
+        {% set relative_path = "_index.md" %}
+    {% else %}
+        {% set relative_path = trimmed_path ~ ".md" %}
+    {% endif %}
     {% set target_page = get_page(path=relative_path) %}
     {% if not links.source is starting_with("https://" ~ config.extra.url) %}
       {% if links.target == page.permalink %}

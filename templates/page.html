@@ -14,9 +14,9 @@
     {{ macros::indiewebcard() }}
 
     <h1 class="p-name"><a href="{{ config.base_url }}">{{ page.title }}</a></h1>
-
+        <a class="u-url" href="{{ page.permalink }}" style="display: none;"></a>
         <div class="e-content p-content">
-            {% set content = page.content | replace(from="[<em>", to='<em class="inner-voice">') | replace(from="</em>]", to="</em>") %}
+          {% set content = page.content | replace(from="[<em>", to='<em class="inner-voice">') | replace(from="</em>]", to="</em>") %}
             {{ content | safe }}
         </div>
 
@@ -31,7 +31,7 @@
         <div class="tag">
           {% if page.taxonomies.tags %}
               {% for tag in page.taxonomies.tags %}
-                  <p class="u-category">{{ tag }}</p>
+                  <a class="u-category" href="{{ get_taxonomy_url(kind='tags', name=tag) }}">{{ tag }}</a>
               {% endfor %}
           {% endif %}
         </div>
