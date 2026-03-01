@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="utf-8">
+    <title>faulty:carboxide</title>
+    <link rel="stylesheet" href="/style.css">
+
+    <link rel="webmention" href="https://webmention.io/faulty.carboxi.de/webmention" />
+
+    
+      <link rel="alternate" type="application/rss+xml" title="RSS" href="https://faulty.carboxi.de/rss.xml">
+    
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 85%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23a1a1a1%22>⌬</text></svg>">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+              // customised options
+              // • auto-render specific keys, e.g.:
+              delimiters: [
+                  {left: '$$', right: '$$', display: true},
+                  {left: '$', right: '$', display: false},
+                  {left: '\\(', right: '\\)', display: false},
+                  {left: '\\[', right: '\\]', display: true}
+              ],
+              // • rendering keys, e.g.:
+              throwOnError : false
+            });
+        });
+    </script>
+</head>
+
+<body>
+    
+
+
+
+
+
+
+
+<div>
+    <div class="h-entry">
+
+    
+  <div class="p-author h-card" style="display: none;">
+    <a class="u-url" href="https:&#x2F;&#x2F;faulty.carboxi.de" rel="me">
+      <a class="u-email" href="mailto:faultypointer@proton.me" rel="me">
+      <img class="u-photo" src="&#x2F;thumbnail.png" alt="faulty">
+      <span class="p-name">faulty</span>
+      <p class="p-note">book</p>
+    </a>
+  </div>
+
+
+    <h1 class="p-name"><a href="https:&#x2F;&#x2F;faulty.carboxi.de">Into the x86_64 land</a></h1>
+        <a class="u-url" href="https:&#x2F;&#x2F;faulty.carboxi.de&#x2F;x86-64-assembly-part-1&#x2F;" style="display: none;"></a>
+        <div class="e-content p-content">
+          
+            <p>We are going to learn assembly programming, more specifically x86_64 assembly. Why? Because that's the architecture my machine uses. As to why I decided to
+learn assembly in the first place, I have no answer to that. So let's get right into it.</p>
+<h2 id="but-first">But First</h2>
+<p>We need (imagine a drumroll here that is ..................... this long)<em>the setup</em>. We need assembler that can convert the assembly source into
+machine code that can be executed. There are many assemblers in the market: <a href="https://www.nasm.us/">nasm</a>, <a href="https://en.wikipedia.org/wiki/GNU_Assembler">gas</a> and
+many others. I've decided to go with nasm because it uses intel syntax which I like over the AT&amp;T syntax.
+The assembler outputs an object file and to convert it to an executable, we need a linker as well.</p>
+<p>We also probably need a debugger for which we have <a href="https://sourceware.org/gdb/">gdb</a>.</p>
+<p>That is it for the tools we are going to need (except for things like editor and lsp if you want and other obvious things).</p>
+<p>Finally lets start writing some assembly code.</p>
+<h2 id="after-this-quick-lesson-on-the-basics">After this quick lesson on the basics</h2>
+<p>We need to have a general understanding of the x86_64 architecture before we write our first assembly code.</p>
+<h3 id="registers">Registers</h3>
+<p>I assume you know what registers are. If not tough luck.</p>
+<p>There are 16 general purpose registers (GPR) in x86_64: RAX, RBX, RCX, RDX, RDI, RSI, RBP, RSP, R8-R15. You can also use the lower 32-bit of these registers when working with 32-bit values.
+In such case, you can use specify them using: EBX, ECX, EDX, EDI, ESI, EBP, ESP, R8D-R15D. There are also 16-bit and 8-bit variants with names AX, BX, ... R8W-R15W for 16-bit and
+AL, BL, ... R8B-R15B for 8-bit ones.
+<em>The D here means doubleword, W means word and B means byte.</em></p>
+<p>There are other registers as well for example flag registers and simd registers but we will not be talking about them now.</p>
+<h3 id="calling-convention">Calling Convention</h3>
+<p>I am not going to explain about calling conventions now because I expect you to know what they are <em class="inner-voice">and its totally not because I am not confident about my explanation</em>. All I'm going to say is
+that calling convention are a set of rules followed by programs mostly about where to put arguments to a function. The convention vary based not only on architecture and OS but also based on
+compilers as well. The calling convention we will follow is the one used by many c compilers for my system described <a href="https://refspecs.linuxbase.org/elf/x86_64-abi-0.99.pdf#section.3.2">here</a>.</p>
+<ul>
+<li>The parameters are passed in registers rdi, rsi, rdx, rcx, r8, r9. Floating point parameters in xmm0 to xmm7</li>
+<li>Additional parameters that don't fit in those registers are passed in stack</li>
+<li>The registers rbx, rsp, rbp, r12-r15 are callee-saved, while the rest of the registers are caller-saved</li>
+<li>So if a function wants to call another function and it has some value in caller preserved registers it wants after the function call, it should save those value before calling another function</li>
+<li>All floating point registers are caller preserved</li>
+<li>Return values are stores in rax (or rdx:rax when necessary) or xmm0 (or xmm1:xmm0) for floating points</li>
+<li>If the return type doesn't fit in rdx:rax, the caller must pass pointer to the storage to where the return value should be placed in register rdi. the callee must return the same poiner in rax</li>
+</ul>
+<p>Lets see it in action. Below is a piece of c code that defines two function. The <code>threesum</code> function takes three <code>int</code> arguments <code>a, b, c</code>. The next function takes two integer arguments, one float and
+another integer argument.</p>
+<pre data-lang="c" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#3577e8;">int </span><span style="color:#2f72e6;">threesum</span><span style="color:#cdd6f4;">(</span><span style="color:#3577e8;">int </span><span style="color:#cdd6f4;">a, </span><span style="color:#3577e8;">int </span><span style="color:#cdd6f4;">b, </span><span style="color:#3577e8;">int </span><span style="color:#cdd6f4;">c) {
+</span><span>  </span><span style="font-weight:bold;color:#3a83e9;">return</span><span> a </span><span style="font-weight:bold;color:#74c7ec;">+</span><span> b </span><span style="font-weight:bold;color:#74c7ec;">+</span><span> c</span><span style="color:#cdd6f4;">;
+</span><span style="color:#cdd6f4;">}
+</span><span>
+</span><span style="color:#3577e8;">float </span><span style="color:#2f72e6;">very_imp_function</span><span style="color:#cdd6f4;">(</span><span style="color:#3577e8;">int </span><span style="color:#cdd6f4;">a, </span><span style="color:#3577e8;">int </span><span style="color:#cdd6f4;">b, </span><span style="color:#3577e8;">float </span><span style="color:#cdd6f4;">c, </span><span style="color:#3577e8;">int </span><span style="color:#cdd6f4;">d) {
+</span><span>  </span><span style="font-weight:bold;color:#3a83e9;">return</span><span> a </span><span style="font-weight:bold;color:#74c7ec;">+</span><span> b </span><span style="font-weight:bold;color:#74c7ec;">+</span><span> d </span><span style="font-weight:bold;color:#74c7ec;">+ </span><span style="color:#cdd6f4;">(</span><span style="color:#3577e8;">float</span><span style="color:#cdd6f4;">)</span><span>c</span><span style="color:#cdd6f4;">;
+</span><span style="color:#cdd6f4;">}
+</span></code></pre>
+<p>If we compile this code (<code>gcc -c filename</code>) and disassemble the object file (<code>objdump -dC --no-show-raw-insn object-file</code>), we see the following output:</p>
+<pre data-lang="asm" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-asm "><code class="language-asm" data-lang="asm"><span style="color:#eba0ac;">0000000000000000 </span><span style="color:#2f72e6;">&lt;threesum&gt;:
+</span><span style="color:#2f72e6;">   </span><span style="color:#eba0ac;">0</span><span style="color:#2f72e6;">: </span><span style="font-weight:bold;color:#3a83e9;">add    </span><span style="color:#cdd6f4;">edi</span><span>,</span><span style="color:#cdd6f4;">esi
+</span><span style="color:#2f72e6;">   </span><span style="color:#eba0ac;">2</span><span style="color:#2f72e6;">: </span><span style="font-weight:bold;color:#3a83e9;">lea    </span><span style="color:#cdd6f4;">eax</span><span>,[</span><span style="color:#cdd6f4;">rdi</span><span>+</span><span style="color:#cdd6f4;">rdx</span><span>*</span><span style="color:#eba0ac;">1</span><span>]
+</span><span style="color:#2f72e6;">   </span><span style="color:#eba0ac;">5</span><span style="color:#2f72e6;">: </span><span style="font-weight:bold;color:#3a83e9;">ret
+</span><span>
+</span><span style="color:#eba0ac;">0000000000000006 </span><span style="color:#2f72e6;">&lt;very_imp_function&gt;:
+</span><span style="color:#2f72e6;">   </span><span style="color:#eba0ac;">6</span><span style="color:#2f72e6;">: </span><span style="font-weight:bold;color:#3a83e9;">movaps </span><span style="color:#cdd6f4;">xmm1</span><span>,</span><span style="color:#cdd6f4;">xmm0
+</span><span style="color:#2f72e6;">   </span><span style="color:#eba0ac;">9</span><span style="color:#2f72e6;">: </span><span style="font-weight:bold;color:#3a83e9;">add    </span><span style="color:#cdd6f4;">edi</span><span>,</span><span style="color:#cdd6f4;">esi
+</span><span style="color:#2f72e6;">   b: </span><span style="font-weight:bold;color:#3a83e9;">add    </span><span style="color:#cdd6f4;">edi</span><span>,</span><span style="color:#cdd6f4;">edx
+</span><span style="color:#2f72e6;">   d: </span><span style="font-weight:bold;color:#3a83e9;">pxor   </span><span style="color:#cdd6f4;">xmm0</span><span>,</span><span style="color:#cdd6f4;">xmm0
+</span><span style="color:#2f72e6;">  </span><span style="color:#eba0ac;">11</span><span style="color:#2f72e6;">: </span><span style="font-weight:bold;color:#3a83e9;">cvtsi2ss </span><span style="color:#cdd6f4;">xmm0</span><span>,</span><span style="color:#cdd6f4;">edi
+</span><span style="color:#2f72e6;">  </span><span style="color:#eba0ac;">15</span><span style="color:#2f72e6;">: </span><span style="font-weight:bold;color:#3a83e9;">addss  </span><span style="color:#cdd6f4;">xmm0</span><span>,</span><span style="color:#cdd6f4;">xmm1
+</span><span style="color:#2f72e6;">  </span><span style="color:#eba0ac;">19</span><span style="color:#2f72e6;">: </span><span style="font-weight:bold;color:#3a83e9;">ret
+</span></code></pre>
+<p>According to the calling convention, the arguments of threesum should go into register <code>rdi</code>, <code>rsi</code> and <code>rdx</code>. Since the are <code>int</code>s(32-bit), we see the edi, esi and eax. The first line
+adds the parameters <code>a</code> and <code>b</code> together and stores it in <code>edi</code>. The second line uses <code>lea</code> to compute the sum of <code>rdi</code>(a+b) and <code>rdx</code>(c) and store it in <code>eax</code> in one go instead of
+doing an <code>add</code> and <code>mov</code>.</p>
+<p>To be honest, I don't understand most of the instruction used in the <code>very_imp_function</code> but we can see that it atleast follows the calling convention. The first two arguments
+go in register <code>edi</code> and <code>esi</code>. The float argument goes into the <code>xmm0</code> register and the final int argument goes into the next register from the convention sequence that is free: <code>edx</code>.</p>
+<p>This would have been more clear if we would have defined another function that calls these two functions but I already wrote this line and I don't want to delete it so try to do it
+as a homework.</p>
+<h2 id="it-is-time">It is time</h2>
+<p>We are gonna write hello world in assembly. We still don't have complete knowledge about how to print "Hello World" in the terminal using x86_64 assembly. But we are gonna figure those
+things out as we go.</p>
+<p>First of all, we need a place to write the assembly code. Since we are using nasm, create a file with a <code>.nasm</code> extension <em class="inner-voice">which isn't necessary but cmon</em>.</p>
+<p>The general form of each nasm source code line is: <code>label:    instruction operands        ; comment</code>. You probably know what these mean so I won't bother explaining them.</p>
+<p>Like c or any other compiled language, if we are going to make our program an executable, we need to provide it with an entry point. The linker we will later use (<code>ld</code>) to convert our
+object file to an executable expects the entry point to be <code>_start</code> by default. So let's define a _start entry point in out program. An entry point is basically the location from where
+the executable start to run code.</p>
+<pre data-lang="asm" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-asm "><code class="language-asm" data-lang="asm"><span style="color:#2f72e6;">_start:
+</span><span style="font-style:italic;color:#bac2de;">  ; I don&#39;t know any instruction yet!!
+</span></code></pre>
+<p>Now, how do we write things to our terminal. If we were using c, we would probably call <code>printf</code> and pass the string "Hello, World" to that function. But we are doing assembly so we can't use printf. Or can we?
+We absolutely can, but that is a topic for future part. Today we are getting a small taste of syscalls. In linux, there is a syscall for writing to a file descriptor called <code>write</code>. You can read about it in details using man pages: <code>man 2 write</code>.
+It has the following definition:</p>
+<pre data-lang="c" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#f9e2af;">ssize_t </span><span style="color:#2f72e6;">write</span><span style="color:#cdd6f4;">(</span><span style="color:#3577e8;">int </span><span style="color:#cdd6f4;">fd, </span><span style="color:#3577e8;">const void </span><span style="color:#cdd6f4;">buf[</span><span>count</span><span style="color:#cdd6f4;">], </span><span style="color:#f9e2af;">size_t </span><span style="color:#cdd6f4;">count);
+</span></code></pre>
+<p>So it expects a file descriptor as its first argument, buffer from which to write to the file as second argument, and the total bytes from buffer to write. It returns the number of bytes
+actually written on success (which may be less than the <code>count</code> passed as argument). On failure, it returns -1;</p>
+<h3 id="but-how-do-we-actually-invoke-the-system-call">But how do we actually invoke the system call</h3>
+<p>The instruction to invoke a syscall in assembly is rightly named <code>syscall</code> which takes no operands. There isn't a single system call so how does one let the os know which system call I
+want to invoke is?</p>
+<p>This is basically the steps required to invoke a syscall using assembly:</p>
+<ul>
+<li>mov the syscall number of the syscall you want to invoke in register <code>rax</code></li>
+<li>mov the arguments the syscall expects in appropriate registers</li>
+<li>use the <code>syscall</code> instruction to invoke the syscall</li>
+<li>the return value from syscall will be in register <code>rax</code></li>
+</ul>
+<p>With this we are ready to print the hello world message to the terminal. First of all, we need a file descriptor. Before you ask what a file descriptor is, <a href="https://en.wikipedia.org/wiki/File_descriptor">here</a> is the wikipedia
+article. The short<em class="inner-voice">and probably incorrect</em> version is that it is a unique integer identifying an open file. We can use the standard output (stdout) to write to the terminal. Its file
+descriptor is 1.</p>
+<pre data-lang="asm" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-asm "><code class="language-asm" data-lang="asm"><span style="color:#2f72e6;">_start:
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rax</span><span>, </span><span style="color:#eba0ac;">0x1</span><span style="font-style:italic;color:#bac2de;">; the syscall number of write is 1
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rdi</span><span>, </span><span style="color:#eba0ac;">0x1</span><span style="font-style:italic;color:#bac2de;">; move the file descriptor of stdout (1) to rdi
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rsi</span><span>, </span><span style="color:#2f72e6;">buffer containg the hello world message
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rdx</span><span>, </span><span style="color:#2f72e6;">how many bytes from the buffer we want to be written
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">syscall
+</span></code></pre>
+<p>Now we need a buffer storing the message (Hello World) that we want to print. To do that we need to learn a little bit about nasm and its program structure. The program is divided into sections. The <code>.text</code> section contains the code, the <code>.data</code> section
+contains the initialized data. There are also <code>.bss</code> and <code>.rodata</code> section for allocating uninitialized space and for defining constant data respectively.</p>
+<p>You can use <a href="https://nasm.us/docs/3.01/nasm03.html#section-3.2">pseudo instructions</a> to declare initialized and uninitialized data.</p>
+<p>With this, we are one step closer to printing hello world.</p>
+<pre data-lang="asm" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-asm "><code class="language-asm" data-lang="asm"><span style="color:#2f72e6;">section .text
+</span><span style="color:#2f72e6;">_start:
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rax</span><span>, </span><span style="color:#eba0ac;">0x1</span><span style="font-style:italic;color:#bac2de;">; the syscall number of write is 1
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rdi</span><span>, </span><span style="color:#eba0ac;">0x1</span><span style="font-style:italic;color:#bac2de;">; move the file descriptor of stdout (1) to rdi
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">lea </span><span style="color:#cdd6f4;">rsi</span><span>, </span><span style="color:#2f72e6;">message
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rdx</span><span>, </span><span style="color:#2f72e6;">length
+</span><span>
+</span><span>
+</span><span style="color:#2f72e6;">section .data
+</span><span style="color:#2f72e6;">  message: db </span><span style="color:#a6e3a1;">&quot;Hello, World&quot;</span><span>, </span><span style="color:#eba0ac;">10
+</span><span style="color:#2f72e6;">  length: equ $ </span><span>- </span><span style="color:#2f72e6;">message
+</span></code></pre>
+<p>A couple of things to note here. If you followed the link to pseudo instruction and read, you would know that <code>db</code> is used to define bytes. It accepts string constants too. The <code>10</code> is for the newline character.</p>
+<p>The <code>equ</code> defines a symbol (in this case <code>length</code>) to a given constant value. The constant value is the value obtained after the evaluation of expression <code>$ - message</code>. The <code>$</code> is assembly position at the beginning of the line containing <code>$</code> from which the position of <code>message</code> is subtracted to get the length of the message.</p>
+<p>If you were reading extra carefully, you might have noticed that an instruction changed in the above program. The <code>mov rsi, message</code> changed to <code>lea rsi, message</code>.</p>
+<p>For this program, both instructions do the same thing but they are very different. We will get to those two and other instructions in a bit, but first lets assemble and link our program.</p>
+<p>To compile the program with nasm, we can run the following command:</p>
+<pre data-lang="bash" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#cdd6f4;">nasm -f</span><span style="color:#2f72e6;"> elf64 hello.nasm
+</span></code></pre>
+<p>This creates an object file called <code>hello.o</code> which we can link using the linker (<code>ld  hello.o</code>) to make it into an executable.</p>
+<p>No need to worry. It is just a warning saying it can't find the entry point <code>_start</code> (which is default for <code>ld</code>). You may be thinking, "What is <code>ld</code> smoking and can I get some too? I have defined the <code>_start</code> right there in the program". We still need to export it so that <code>ld</code> can see the thing. That is the work of the <code>global</code> directive.</p>
+<p>We have finally completed the hello world in assembly. Let's also exit from the program using <code>exit</code> syscall because why not?</p>
+<pre data-lang="asm" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-asm "><code class="language-asm" data-lang="asm"><span style="color:#2f72e6;">global _start
+</span><span style="color:#2f72e6;">section .data
+</span><span style="color:#2f72e6;">  message: db </span><span style="color:#a6e3a1;">&quot;Hello World&quot;</span><span>, </span><span style="color:#eba0ac;">10
+</span><span style="color:#2f72e6;">  len: equ $ </span><span>- </span><span style="color:#2f72e6;">message
+</span><span>
+</span><span style="color:#2f72e6;">section .text
+</span><span>
+</span><span style="color:#2f72e6;">_start:
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rax</span><span>, </span><span style="color:#eba0ac;">0x1</span><span style="font-style:italic;color:#bac2de;">;
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rdi</span><span>, </span><span style="color:#eba0ac;">0x1</span><span style="font-style:italic;color:#bac2de;">; 
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">lea </span><span style="color:#cdd6f4;">rsi</span><span>, </span><span style="color:#2f72e6;">message</span><span style="font-style:italic;color:#bac2de;">;
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rdx</span><span>, </span><span style="color:#2f72e6;">len</span><span style="font-style:italic;color:#bac2de;">;
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">syscall
+</span><span>
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rax</span><span>, </span><span style="color:#eba0ac;">0x3c
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rdi</span><span>, </span><span style="color:#eba0ac;">0x1
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">syscall
+</span></code></pre>
+<p>You might think that the syscall also use the same calling convention as the one we previously discussed, and you would be wrong. The registers used by the syscalls are: <code>rdi</code>, <code>rsi</code>, <code>rdx</code>, <code>r10</code>, <code>r8</code>, <code>r9</code>. You can find the syscall with their numbers and the arguments they expect in <a href="https://x64.syscall.sh/">this website</a>.</p>
+<p>Phew! That was something but we got through and printed out hello world message in the terminal. Now its time to say bye until the next part is what I would say if I didn't think the next part would be out in atleast a month or two if ever. But I know myself better than that. So as a parting gift until next time <em class="inner-voice">if there is a next time</em>, I wanna leave with something more than just a hello world.</p>
+<p>We haven't learned about SIMD registers or looping or anything like that so there isn't a lot we can do here. What we are gonna make is something very simple. We are making a cryptographically secure random number generator. Or atleast a bootleg version of it.</p>
+<h2 id="lets-get-familiar-with-some-instructions-first">Lets get familiar with some instructions first</h2>
+<p>We have used three instruction till now: <code>lea</code>, <code>mov</code> and <code>syscall</code>. We also have seen some more but lets not talk about them right now.</p>
+<p>The <code>mov</code> instruction moves(copies) the value from source to destination. For example: <code>mov rax, rdx</code> moves the value from register <code>rdx</code> to <code>rax</code>. This is called register addressing.
+As we have already seen, we can also use an immediate value as a source. This is called immediate addressing.
+The one last addressing we need to worry about is the memory addressing. With it, we can use memory location as source or destination operand.
+The general equation for addressing memory is: [ base + index * scale + displacement ]. Here, the base and index can be any general purpose register, index can be one of [1, 2, 4, 8] and displacement can be any 8-bit, 16-bit or 32-bit value.</p>
+<p>Let us assume we have an integer(32-bit) array. The address of the array(as well as that of first element) is stored in register rax.
+To move the first element of array into register rdx, we can do the following: <code>mov rdx, [rax]</code>.</p>
+<p>If we want to move the third element into <code>r8</code> register: <code>mov r8, [rax + 8]</code>. Since the address is byte addressable and our integer elements are each 4 bytes in size, we have to add 4 to get the next element.
+What if we want to increment the $i^{th}$ element by 4? No worries.</p>
+<pre data-lang="asm" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-asm "><code class="language-asm" data-lang="asm"><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rbx</span><span>, </span><span style="color:#eba0ac;">0x5</span><span style="font-style:italic;color:#bac2de;">; lets assume i is 5 for this instance
+</span><span style="font-weight:bold;color:#3a83e9;">add </span><span>[</span><span style="color:#cdd6f4;">rax </span><span>+ </span><span style="color:#cdd6f4;">rbx </span><span>* </span><span style="color:#eba0ac;">4</span><span>], </span><span style="color:#eba0ac;">0x4
+</span></code></pre>
+<p>Yes, we can use memory address as destination in other instruction as well. Speaking of which, <code>add</code> adds the value of source and destination and stores the result in destination.</p>
+<p>What do you think <code>lea rsi, [rax + rbx * 4]</code> does? The <code>rbx</code> is still 5.
+It moves the <strong>adddress</strong> of the $5^{th}$ element of the array into register <code>rsi</code>. <code>lea</code> computes the effective address of source operand and stores it into the destination operand.</p>
+<p>Lets quickly go over the basic and simple instructions. We have already seen the <code>add</code> instruction. There is a <code>sub</code> instruction for substraction.
+<code>and</code>, <code>or</code>, <code>nor</code>, <code>xor</code> performs bitwise and, or, not or xor of two operands respectively and stores the result in destination operand.</p>
+<p>The <code>cmp</code> instruction compares two operands and changes the flag as if the source operands was subtracted from the destination operand.
+Speaking of</p>
+<h3 id="flags">Flags</h3>
+<p>The RFLAGS register is a 64 register with its upper 32 bits reserved. The lower 32 bits contain groups of status, control and system flags.
+The only flags we need to care about for now <em class="inner-voice">well we don't really need to care about any of them in this part</em> are the following:</p>
+<ul>
+<li>Carry Flag: set if arithmetic operation generates a carry or a borrow out of MSB, cleared otherwise</li>
+<li>Zero Flag: set if the result is zero, cleared otherwise</li>
+<li>Signed Flag: equal to the MSB of result</li>
+</ul>
+<p>The condition jump instruction uses those flags to jump to specified location based on some condition.
+There are different kinds of conditional jumps and they are often used with <code>cmp</code> to jump to an instruction in some location based on
+the ordering of two values.
+For example, <code>JE</code>: jump if zero flag is equal to zero. (so when used after <code>cmp</code> if two operands were equal)
+You can check out all the conditional jump instructions <a href="https://www.felixcloutier.com/x86/jcc">here</a>.</p>
+<p>There is also an unconditional jump(<code>jmp</code>) that just jumps to the instruction at the location.</p>
+<h2 id="cryptographically-secure-random-number-generator">Cryptographically Secure Random Number Generator</h2>
+<p>So, how are we gonna be doing this? If you expected some actual algorithms like <a href="https://en.wikipedia.org/wiki/Salsa20#ChaCha_variant">cha cha slide</a> or <a href="https://en.wikipedia.org/wiki/Xorshift#xoshiro">xoshiro</a> or any other then be ready to be disappointed.
+Or you can take this as an opportunity and implement those algorithm in assembly yourself. For now, we are gonna do things simple.
+What we will do is read few bytes from "/dev/urandom". We also don't have anything that can use the random number so we will just print it.</p>
+<p>Let me outline what exactly what we will do. Maybe you can try to do it yourself before looking at the code.</p>
+<ul>
+<li>we need to open the file "/dev/urandom" using the <code>open</code> syscall</li>
+<li>use the fd returned by <code>open</code> to read the bytes to some memory location</li>
+<li>write the random (probably with some accompanying text) to standard out</li>
+</ul>
+<p>About that last point, we could write a simple function to convert the integer to ascii so that write can print it out but again we haven't touched loops yet so we lets opt out for something simpler.</p>
+<p>Remember when I said <code>printf</code> was a topic for the future part. Well, I lied. We are going to use it to print the random number.
+So How do we call printf? What we can do is tell nasm "hey, I know I havent defined this <code>printf</code> thing but just trust me it exists". The <code>extern</code> directive is used to do that.
+Then we can pass the library that actually defines the printf to <code>ld</code> when linking and we are done.</p>
+<p>Here is the full code in all of its glory.</p>
+<pre data-lang="asm" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-asm "><code class="language-asm" data-lang="asm"><span style="color:#2f72e6;">global _start
+</span><span style="color:#2f72e6;">extern printf
+</span><span>
+</span><span style="color:#2f72e6;">section .data
+</span><span style="color:#2f72e6;">  filename: db </span><span style="color:#a6e3a1;">&quot;/dev/urandom&quot;</span><span>, </span><span style="color:#eba0ac;">0
+</span><span style="color:#2f72e6;">  message: db </span><span style="color:#a6e3a1;">&quot;Random Number: %u&quot;</span><span>, </span><span style="color:#eba0ac;">10</span><span>, </span><span style="color:#eba0ac;">0
+</span><span style="color:#2f72e6;">  open_failure: db </span><span style="color:#a6e3a1;">&quot;Failed to open /dev/urandom&quot;</span><span>, </span><span style="color:#eba0ac;">10
+</span><span style="color:#2f72e6;">  open_failure_len: equ $ </span><span>- </span><span style="color:#2f72e6;">open_failure
+</span><span style="color:#2f72e6;">  read_failure: db </span><span style="color:#a6e3a1;">&quot;Failed to read from file&quot;</span><span>, </span><span style="color:#eba0ac;">10
+</span><span style="color:#2f72e6;">  read_failure_len: equ $ </span><span>- </span><span style="color:#2f72e6;">read_failure
+</span><span>
+</span><span style="color:#2f72e6;">section .bss
+</span><span style="color:#2f72e6;">  random_number: resd </span><span style="color:#eba0ac;">1
+</span><span>
+</span><span style="color:#2f72e6;">section .text 
+</span><span>
+</span><span style="color:#2f72e6;">_start:
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rax</span><span>, </span><span style="color:#eba0ac;">0x2
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">lea </span><span style="color:#cdd6f4;">rdi</span><span>, </span><span style="color:#2f72e6;">filename 
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rsi</span><span>, </span><span style="color:#eba0ac;">0x0</span><span style="font-style:italic;color:#bac2de;">; O_RDONLY
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">syscall
+</span><span>
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">cmp </span><span style="color:#cdd6f4;">rax</span><span>, </span><span style="color:#eba0ac;">0x0</span><span style="font-style:italic;color:#bac2de;">; 
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">jl </span><span style="color:#2f72e6;">failed_to_open
+</span><span>
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rdi</span><span>, </span><span style="color:#cdd6f4;">rax
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rax</span><span>, </span><span style="color:#eba0ac;">0x0
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">lea </span><span style="color:#cdd6f4;">rsi</span><span>, </span><span style="color:#2f72e6;">random_number
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rdx</span><span>, </span><span style="color:#eba0ac;">0x4
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">syscall
+</span><span>
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">cmp </span><span style="color:#cdd6f4;">rax</span><span>, </span><span style="color:#eba0ac;">0x4
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">jne </span><span style="color:#2f72e6;">failed_to_read
+</span><span>
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">lea </span><span style="color:#cdd6f4;">rdi</span><span>, </span><span style="color:#2f72e6;">message
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">esi</span><span>, [</span><span style="color:#2f72e6;">random_number</span><span>]
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">xor </span><span style="color:#cdd6f4;">rax</span><span>, </span><span style="color:#cdd6f4;">rax
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">call </span><span style="color:#2f72e6;">printf
+</span><span>
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rax</span><span>, </span><span style="color:#eba0ac;">0x3c
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rdi</span><span>, </span><span style="color:#eba0ac;">0x0
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">syscall
+</span><span>
+</span><span>
+</span><span>
+</span><span style="color:#2f72e6;">failed_to_open:
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">lea </span><span style="color:#cdd6f4;">rdi</span><span>, </span><span style="color:#2f72e6;">open_failure
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rdx</span><span>, </span><span style="color:#2f72e6;">open_failure_len
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">jmp </span><span style="color:#2f72e6;">exit_with_error
+</span><span>
+</span><span style="color:#2f72e6;">failed_to_read:
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">lea </span><span style="color:#cdd6f4;">rdi</span><span>, </span><span style="color:#2f72e6;">read_failure
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rdx</span><span>, </span><span style="color:#2f72e6;">read_failure_len
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">jmp </span><span style="color:#2f72e6;">exit_with_error
+</span><span>
+</span><span>
+</span><span style="color:#2f72e6;">exit_with_error:
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">r8</span><span>, </span><span style="color:#cdd6f4;">rdi
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rax</span><span>, </span><span style="color:#eba0ac;">0x1
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rdi</span><span>, </span><span style="color:#eba0ac;">0x1
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rsi</span><span>, </span><span style="color:#cdd6f4;">r8
+</span><span style="font-style:italic;color:#bac2de;">  ; rdx should be set by whatever calls this
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">syscall 
+</span><span>
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rax</span><span>, </span><span style="color:#eba0ac;">0x3c
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">mov </span><span style="color:#cdd6f4;">rdi</span><span>, </span><span style="color:#eba0ac;">0x1
+</span><span style="color:#2f72e6;">  </span><span style="font-weight:bold;color:#3a83e9;">syscall
+</span></code></pre>
+<p>The only thing I should mention is that the <code>0</code> at the end of <code>message</code> is because the format string <code>printf</code> expects is a null (0) terminated string.</p>
+<p>We will discuss about <code>call</code> instruction as well as <code>ret</code> and other things related to it in a future part, but for now you can see that
+<code>printf</code> follows the calling convention. We will also discuss about other aspects of calling convention like aligning stack in the future.</p>
+<p>With that, I'm off.</p>
+
+        </div>
+
+        <div class="date">
+          
+              <time class="dt-published" datetime="2025-11-06T00:00:00Z">
+                  November 6, 2025
+              </time>
+          
+        </div>
+            
+        <div class="tag">
+          
+              
+                  <a class="u-category" href="https://faulty.carboxi.de/tags/x86-64/">x86_64</a>
+              
+                  <a class="u-category" href="https://faulty.carboxi.de/tags/assembly/">assembly</a>
+              
+                  <a class="u-category" href="https://faulty.carboxi.de/tags/into-x86-64-land/">into-x86_64-land</a>
+              
+          
+        </div>
+    </div>
+</div>
+
+<div class="spacing"><div>
+
+
+
+
+
+
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+
+
+
+
+
+
+  <section class="next">
+      <h2>Wondering?</h2>
+      <div><p>Maybe explore my <a href="/tags">tags</a> & archives and send me a <a href="https://indieweb.org/Webmention">webmention</a>. Follow the site using <a href="https://faulty.carboxi.de/rss.xml">RSS</a>. Just roam arount a bit.</p></div>
+  </section>
+
+
+<div class="spacing"><div>
+
+<section>
+  
+  
+  
+  
+  
+  <div>
+    <h2 class="latest-month-header">Latest Posts</h2>
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post">
+          <a href="https://faulty.carboxi.de/quit/">I Quit.</a>
+          <span class="separator"></span>
+          <time datetime="2026-02-28">
+            28<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  
+
+  <div>
+    <h3>Posts from November 2025</h3>
+    
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/x86-64-assembly-part-1-5/">Into the x86_64 land Part 1.5: Memory Layout of Struct</a>
+          <span class="separator"></span>
+          <time datetime="2025-11-28">
+            28<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post current-post">
+          <a href="https://faulty.carboxi.de/x86-64-assembly-part-1/">Into the x86_64 land</a>
+          <span class="separator"></span>
+          <time datetime="2025-11-06">
+            6<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+
+
+  
+  <details class="previous-months-accordion">
+    <summary>Archives</summary>
+    
+    
+    
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2026</span>
+              
+            
+            
+              <span class="month-header">February</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/quit/">I Quit.</a>
+          <span class="separator"></span>
+          <time datetime="2026-02-28">
+            28<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2025</span>
+              
+            
+            
+              <span class="month-header">July</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+          
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/organizationandmanagement/">Organization and Management</a>
+          <span class="separator"></span>
+          <time datetime="2025-07-21">
+            21<sup>st</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/whatsgoingon/">Whats Going On</a>
+          <span class="separator"></span>
+          <time datetime="2025-07-15">
+            15<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">April</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/goingallin/">Going All In</a>
+          <span class="separator"></span>
+          <time datetime="2025-04-10">
+            10<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">March</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+          
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/horror/">I Love Horror Movies</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-23">
+            23<sup>rd</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/learning/">I love learning things.</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-09">
+            9<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/adhd/">I Do Have Mouth, and Still I Can&#x27;t Scream</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-07">
+            7<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">February</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/aproblemaday5/">A problem a day: Day 5</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-25">
+            25<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/aproblemaday4/">A problem a day: Day 4</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-24">
+            24<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+          
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/aproblemaday3/">A problem a day: Day 3</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-23">
+            23<sup>rd</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+          
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/aproblemaday2/">A problem a day: Day 2</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-22">
+            22<sup>nd</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/aproblemaday/">A problem a day: Day 1</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-20">
+            20<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/hello/">Hello</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-08">
+            8<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/about/">About Me</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-05">
+            5<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2014</span>
+              
+            
+            
+              <span class="month-header">March</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/one/">Template</a>
+          <span class="separator"></span>
+          <time datetime="2014-03-14">
+            14<sup>th</sup>
+          </time>
+        </article>
+      
+    
+  </details>
+</section>
+
+
+</body>
+
+<footer>
+  
+  <p>
+  <a href="/" >Main</a>
+  <a href="/rss.xml">Feed</a>
+  <a href="/author" >Author</a>
+  <a href="/nexus" >Nexus</a>
+  <a href="/now" >Now</a>
+  </p>
+  
+</footer>
+</html>

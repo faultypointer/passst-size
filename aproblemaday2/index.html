@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="utf-8">
+    <title>faulty:carboxide</title>
+    <link rel="stylesheet" href="/style.css">
+
+    <link rel="webmention" href="https://webmention.io/faulty.carboxi.de/webmention" />
+
+    
+      <link rel="alternate" type="application/rss+xml" title="RSS" href="https://faulty.carboxi.de/rss.xml">
+    
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 85%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23a1a1a1%22>⌬</text></svg>">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+              // customised options
+              // • auto-render specific keys, e.g.:
+              delimiters: [
+                  {left: '$$', right: '$$', display: true},
+                  {left: '$', right: '$', display: false},
+                  {left: '\\(', right: '\\)', display: false},
+                  {left: '\\[', right: '\\]', display: true}
+              ],
+              // • rendering keys, e.g.:
+              throwOnError : false
+            });
+        });
+    </script>
+</head>
+
+<body>
+    
+
+
+
+
+
+
+
+<div>
+    <div class="h-entry">
+
+    
+  <div class="p-author h-card" style="display: none;">
+    <a class="u-url" href="https:&#x2F;&#x2F;faulty.carboxi.de" rel="me">
+      <a class="u-email" href="mailto:faultypointer@proton.me" rel="me">
+      <img class="u-photo" src="&#x2F;thumbnail.png" alt="faulty">
+      <span class="p-name">faulty</span>
+      <p class="p-note">book</p>
+    </a>
+  </div>
+
+
+    <h1 class="p-name"><a href="https:&#x2F;&#x2F;faulty.carboxi.de">A problem a day: Day 2</a></h1>
+        <a class="u-url" href="https:&#x2F;&#x2F;faulty.carboxi.de&#x2F;aproblemaday2&#x2F;" style="display: none;"></a>
+        <div class="e-content p-content">
+          
+            <h2 id="origin">Origin</h2>
+<p>url: <a href="https://leetcode.com/problems/jump-game/description/">Leetcode: Problem no. 55</a></p>
+<h3 id="problem">Problem</h3>
+<p>You are given an integer array <code>nums</code>. You are initially positioned at the array's <strong>first index</strong>, and each element in the array represents your maximum jump length at that position.</p>
+<p>Return <code>true</code> <em>if you can reach the last index, or</em> <code>false</code> <em>otherwise</em>.</p>
+<h3 id="examples">Examples</h3>
+<p><strong>Input:</strong> nums = [2,3,1,1,4]
+<strong>Output:</strong> true
+<strong>Explanation:</strong> Jump 1 step from index 0 to 1, then 3 steps to the last index.</p>
+<p><strong>Input:</strong> nums = [3,2,1,0,4]
+<strong>Output:</strong> false
+<strong>Explanation:</strong> You will always arrive at index 3 no matter what. Its maximum jump length is 0, which makes it impossible to reach the last index.</p>
+<h3 id="constraints">Constraints</h3>
+<ul>
+<li>$1 &lt;= nums.length &lt;= 10^4$</li>
+<li>$0 &lt;= nums[i] &lt;= 10^5$</li>
+</ul>
+<h2 id="journey">Journey</h2>
+<p>Well if the index of the array are the nodes of a graph and the jumps indicate the path from one node to another ten its just finding if a path exists from first to last node(index). With the added context and information I feel like there is an easier way to do this.</p>
+<h3 id="a-simple-dfs">A Simple DFS</h3>
+<ul>
+<li>put the start index(0) in the stack.</li>
+<li>while the stack is not empty
+<ul>
+<li>pop from stack</li>
+<li>if this is the final index (nums.length) return true</li>
+<li>put all of its children (current index + (1 to the value at current index))</li>
+</ul>
+</li>
+<li>return false</li>
+</ul>
+<p>DFS time complexity is $\mathcal{O}(b^m)$ where b is the branching factor and m is the maximum depth
+which is a lot to be honest.
+And I was correct.
+<img src="/images/apad2-time.png" alt="Solution rejected due to time limit exceeding" /></p>
+<p>so I do need to optimize this using the added information or go for a different approach.</p>
+<p>starting from the last index, move down wards to the first index
+if value at current index is greater than or equal to (goal index - current index) set goal index to current index</p>
+<p>when the loop ends, if the goal index is 0 return true else false</p>
+<p>I don't know how I went from exponential time to linear time. Also I don't know what made me think about the numbers in reverse.</p>
+<h2 id="destination">Destination</h2>
+<p>We have a list of numbers, for example like this [2,3,1,1,4], and we want to find if we can go from index 0 to last index. Say we are at the goal index, so without any jumping we are already at the goal index and thus have reached it.</p>
+<p>What about the index one before the goal. If we can jump from this one to goal, we have reached the goal index. How do we know if we can jump from this one to the last one? Since the value at that index indicates the jumping ability, we can jump from current index to goal index if the value is greater than the distance between current index and goal index. So if the value is greater than or equal to 1 we can reach the goal index from the index one before it.</p>
+<p>Do you know what this means? It means the if we can somehow reach this index, then we can reach the goal index as well. So we can just set this index as the goal index.</p>
+<p>What if we can't jump from this index to the goal one? Does that mean we stop the algorithm and return false? No, because the index before this index may have the jumping ability to jump over this index. Imagine the numbers as [2, 0, 1]. The second last index's value is 0 so we can't reach the goal state from it. But the index before it, the first index,  has value 2 which is equal to the distance between first index and the goal index. So we set the goal index to first index.</p>
+<p>We continue this until we reach the first index. At this point, the goal index will the index closest to the first index from which we can reach the actual goal index defined in the problem. If we can reach  the current goal index from the first index, the goal index becomes the first index.</p>
+<p>If ,after the loop is finished, the goal index is the current index, that means we can reach the actual goal index from the first index.</p>
+<pre data-lang="rust" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#3577e8;">impl </span><span>Solution </span><span style="color:#cdd6f4;">{
+</span><span>    </span><span style="color:#3577e8;">pub fn </span><span style="color:#2f72e6;">can_jump</span><span style="color:#cdd6f4;">(nums: </span><span style="color:#f9e2af;">Vec</span><span style="color:#cdd6f4;">&lt;</span><span style="color:#3577e8;">i32</span><span style="color:#cdd6f4;">&gt;) -&gt; </span><span style="color:#3577e8;">bool </span><span style="color:#cdd6f4;">{
+</span><span>        </span><span style="color:#3577e8;">let mut</span><span> goal_idx </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> nums</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">len</span><span style="color:#cdd6f4;">() </span><span style="font-weight:bold;color:#74c7ec;">- </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">;
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">for </span><span style="color:#cdd6f4;">(</span><span>curr_idx</span><span style="color:#cdd6f4;">,</span><span> val</span><span style="color:#cdd6f4;">) </span><span style="font-weight:bold;color:#74c7ec;">in</span><span> nums</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">iter</span><span style="color:#cdd6f4;">().</span><span style="color:#2f72e6;">enumerate</span><span style="color:#cdd6f4;">().</span><span style="color:#2f72e6;">rev</span><span style="color:#cdd6f4;">() {
+</span><span>            </span><span style="font-weight:bold;color:#3a83e9;">if </span><span style="font-weight:bold;color:#74c7ec;">*</span><span>val </span><span style="font-weight:bold;color:#74c7ec;">&gt;= </span><span style="color:#cdd6f4;">(</span><span>goal_idx </span><span style="font-weight:bold;color:#74c7ec;">-</span><span> curr_idx</span><span style="color:#cdd6f4;">) </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">i32 </span><span style="color:#cdd6f4;">{
+</span><span>                goal_idx </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> curr_idx</span><span style="color:#cdd6f4;">;
+</span><span>            </span><span style="color:#cdd6f4;">}
+</span><span>        </span><span style="color:#cdd6f4;">} 
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">if</span><span> goal_idx </span><span style="font-weight:bold;color:#74c7ec;">== </span><span style="color:#fab387;">0 </span><span style="color:#cdd6f4;">{
+</span><span>            </span><span style="font-weight:bold;color:#3a83e9;">return </span><span style="color:#eba0ac;">true</span><span style="color:#cdd6f4;">;
+</span><span>        </span><span style="color:#cdd6f4;">}
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">return </span><span style="color:#eba0ac;">false</span><span style="color:#cdd6f4;">;
+</span><span>    </span><span style="color:#cdd6f4;">}
+</span><span style="color:#cdd6f4;">}
+</span></code></pre>
+
+        </div>
+
+        <div class="date">
+          
+              <time class="dt-published" datetime="2025-02-22T00:00:00Z">
+                  February 22, 2025
+              </time>
+          
+        </div>
+            
+        <div class="tag">
+          
+              
+                  <a class="u-category" href="https://faulty.carboxi.de/tags/algorithm/">algorithm</a>
+              
+                  <a class="u-category" href="https://faulty.carboxi.de/tags/a-problem-a-day/">a-problem-a-day</a>
+              
+          
+        </div>
+    </div>
+</div>
+
+<div class="spacing"><div>
+
+
+
+
+
+
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+
+
+
+
+
+
+  <section class="next">
+      <h2>Wondering?</h2>
+      <div><p>Maybe explore my <a href="/tags">tags</a> & archives and send me a <a href="https://indieweb.org/Webmention">webmention</a>. Follow the site using <a href="https://faulty.carboxi.de/rss.xml">RSS</a>. Just roam arount a bit.</p></div>
+  </section>
+
+
+<div class="spacing"><div>
+
+<section>
+  
+  
+  
+  
+  
+
+  <div>
+    <h3>Posts from February 2025</h3>
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/aproblemaday5/">A problem a day: Day 5</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-25">
+            25<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/aproblemaday4/">A problem a day: Day 4</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-24">
+            24<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+          
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/aproblemaday3/">A problem a day: Day 3</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-23">
+            23<sup>rd</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+          
+        
+        <article class="listing latest-month-post current-post">
+          <a href="https://faulty.carboxi.de/aproblemaday2/">A problem a day: Day 2</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-22">
+            22<sup>nd</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/aproblemaday/">A problem a day: Day 1</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-20">
+            20<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/hello/">Hello</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-08">
+            8<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/about/">About Me</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-05">
+            5<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+    
+  </div>
+
+
+  
+  <details class="previous-months-accordion">
+    <summary>Archives</summary>
+    
+    
+    
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2026</span>
+              
+            
+            
+              <span class="month-header">February</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/quit/">I Quit.</a>
+          <span class="separator"></span>
+          <time datetime="2026-02-28">
+            28<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2025</span>
+              
+            
+            
+              <span class="month-header">November</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/x86-64-assembly-part-1-5/">Into the x86_64 land Part 1.5: Memory Layout of Struct</a>
+          <span class="separator"></span>
+          <time datetime="2025-11-28">
+            28<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/x86-64-assembly-part-1/">Into the x86_64 land</a>
+          <span class="separator"></span>
+          <time datetime="2025-11-06">
+            6<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">July</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+          
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/organizationandmanagement/">Organization and Management</a>
+          <span class="separator"></span>
+          <time datetime="2025-07-21">
+            21<sup>st</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/whatsgoingon/">Whats Going On</a>
+          <span class="separator"></span>
+          <time datetime="2025-07-15">
+            15<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">April</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/goingallin/">Going All In</a>
+          <span class="separator"></span>
+          <time datetime="2025-04-10">
+            10<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">March</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+          
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/horror/">I Love Horror Movies</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-23">
+            23<sup>rd</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/learning/">I love learning things.</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-09">
+            9<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/adhd/">I Do Have Mouth, and Still I Can&#x27;t Scream</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-07">
+            7<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2014</span>
+              
+            
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/one/">Template</a>
+          <span class="separator"></span>
+          <time datetime="2014-03-14">
+            14<sup>th</sup>
+          </time>
+        </article>
+      
+    
+  </details>
+</section>
+
+
+</body>
+
+<footer>
+  
+  <p>
+  <a href="/" >Main</a>
+  <a href="/rss.xml">Feed</a>
+  <a href="/author" >Author</a>
+  <a href="/nexus" >Nexus</a>
+  <a href="/now" >Now</a>
+  </p>
+  
+</footer>
+</html>

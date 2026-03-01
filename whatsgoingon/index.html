@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="utf-8">
+    <title>faulty:carboxide</title>
+    <link rel="stylesheet" href="/style.css">
+
+    <link rel="webmention" href="https://webmention.io/faulty.carboxi.de/webmention" />
+
+    
+      <link rel="alternate" type="application/rss+xml" title="RSS" href="https://faulty.carboxi.de/rss.xml">
+    
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 85%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23a1a1a1%22>⌬</text></svg>">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+              // customised options
+              // • auto-render specific keys, e.g.:
+              delimiters: [
+                  {left: '$$', right: '$$', display: true},
+                  {left: '$', right: '$', display: false},
+                  {left: '\\(', right: '\\)', display: false},
+                  {left: '\\[', right: '\\]', display: true}
+              ],
+              // • rendering keys, e.g.:
+              throwOnError : false
+            });
+        });
+    </script>
+</head>
+
+<body>
+    
+
+
+
+
+
+
+
+<div>
+    <div class="h-entry">
+
+    
+  <div class="p-author h-card" style="display: none;">
+    <a class="u-url" href="https:&#x2F;&#x2F;faulty.carboxi.de" rel="me">
+      <a class="u-email" href="mailto:faultypointer@proton.me" rel="me">
+      <img class="u-photo" src="&#x2F;thumbnail.png" alt="faulty">
+      <span class="p-name">faulty</span>
+      <p class="p-note">book</p>
+    </a>
+  </div>
+
+
+    <h1 class="p-name"><a href="https:&#x2F;&#x2F;faulty.carboxi.de">Whats Going On</a></h1>
+        <a class="u-url" href="https:&#x2F;&#x2F;faulty.carboxi.de&#x2F;whatsgoingon&#x2F;" style="display: none;"></a>
+        <div class="e-content p-content">
+          
+            <p>It's been more than three months since my <a href="https://faulty.carboxi.de/goingallin/">last post</a> where I waffeled about
+focusing on rust. I can't say I have kept my word nor can I say that I went back on what I said. Instead of explaining
+what I mean, I though maybe I should write about all the things I did during the last three months. I am also curious to
+know how those three months went by cause it's all hazy up here.</p>
+<p>Instead of writing about the things I did in chronological order, I though its better to write about them topic wise. <em>Since I can't
+remember exactly the order of events</em></p>
+<p>Let's start with</p>
+<h2 id="debian">Debian</h2>
+<p>I switched. To arch BTW.
+I'm still on arch. I did a quick jump to debian trixie and back because of major project (more on that later).
+I was using Gnome in debian and stayed with Gnome after switching to arch. That changed after that little hop to debian
+and back. I am using <a href="https://github.com/YaLTeR/niri">niri</a> window manager now.</p>
+<h3 id="gnome-niri-and-me">Gnome, Niri and Me</h3>
+<p>A little history about my experience with niri. I was introduced to niri by <a href="https://flux.carboxi.de/">scientiac</a>. Niri
+is a scrollable window manager.
+I used niri on nixos before I moved to debian. Since niri wasn't (and still isn't I think) available as a package on debian, I
+tried to build it myself. It depended (maybe not directly) on <a href="https://github.com/wmww/gtk4-layer-shell">gtk4-layer-shell</a> which
+was also not available on debian. Again, I tried to build it myself. I couldn't. I don't remember the exact problem but it was
+something about wayland protocols. At the time, freedesktop.org was mitrating its server or something so it was not working. So
+I gave up on building niri and stayed with gnome.</p>
+<p>After using gnome for a while, I began to like it and niri was completely out of my mind. I was happy with gnome and debian until I
+wasn't. This was more of a problem with debian than gnome. So I switched to arch <em>btw</em>. I was so in love with gnome that I stayed with
+gnome. I had totally forgotten about niri.</p>
+<p>It was maybe two weeks ago that I decided to switch to debian trixie due to something related to major project. One thing lead to another
+and I decided to build <a href="https://faulty.carboxi.de/whatsgoingon/ghostty.org">ghostty</a>. I ran into some problem and after looking for some time, it said gtk4-layer-shell missing.
+I decided to give it another try and build gtk4-layer-shell and to my surprize it build and so did ghostty after that. This got me thinking
+that maybe I can build niri too and I could. I switched back to arch the next day because the major project problem was still a problem in
+debian too.</p>
+<p>I had forgotten all about niri. I know I had. But just building it on debian (I couldn't even use it there) brought back so many memory that
+I had to go back and I did. I spent the next day configuring niri and am using it as a daily driver. I also have gnome but to be honest I don't
+think I'll go back anytime soon.</p>
+<h2 id="emacs">Emacs</h2>
+<p>I am still using emacs. I have helix (for when I have to do something quickly from terminal) and zed (for looking through linux and redox source code)
+but emacs is still the editor of choice (and probably will be for a long time) when it comes to development. I could have included
+this in the previous topic if not for ...</p>
+<h3 id="the-organ">The Organ</h3>
+<p>The emacs <a href="https://orgmode.org/">org-mode</a> is an excelent tool for keeping personal notes, literate programming, planning projects among other things.
+I had a pretty neat system in place for organizing notes, journals, todos and everything else. I called it <em>Organ</em>. <em>kinda cringe now that I think about it</em>
+It was going great. I kept track of things I needed to do each day. I kept the links to articles and videos I found interesting and tried to read or watch one
+each day. I kept track of the things I was learning. I don't know whether it happened gradually or spontaneously, but I stopped.</p>
+<p>I had recently taken up <a href="https://logseq.com/">Logseq</a> for note taking but it has also been dry for past few days and I have to intention or motivation to continue it.</p>
+<h2 id="rust">Rust</h2>
+<p>I don't know where to begin with this. The books that I mentioned in the previous blogs, I have read two out of four which isn't a lot. Actually thats kinda low given the
+three months of time frame since I also haven't done any project in that time. I do have these to show for:</p>
+<ul>
+<li>Prime number generation using different techniques in rust. <a href="https://github.com/faultypointer/largestprime">repo</a></li>
+<li>One Billion Rows Challenge in rust. <a href="https://github.com/faultypointer/OneBRC">repo</a>
+I learnt some things about performance and performance testing in rust.</li>
+</ul>
+<p>I books that I did complete (<a href="https://rust-unofficial.github.io/too-many-lists/index.html">Learn Rust Entirely with Too Many LinkedList</a>, <a href="https://marabos.nl/atomics/">Rust Atomics and Locks</a>)
+taught me quite a lot about unsafe rust, atomics and memory ordering, rust types thread safe programming etc.</p>
+<h3 id="go">Go</h3>
+<p>I have also been learn go for a week or two. I wanted to learn backend from the ground up and thought go would be perfect for that. Another reason for learning a language other than rust
+is to be able to find a job after engineering finishes. <em>9 months to go</em> I probably should have gone with something like java or c++ or python but I like go and after understanding the
+the ins and outs of backend development, it shouldn't be that hard to learn something like Django, or Laravel or dotnet.</p>
+<p>I am currently reading "The Go Programming Language" book. I'm halfway through it even though its almost been two weeks (or maybe more). But thats just how I
+decided to go with this. Rust is still the main focus and with college and major project, I don't really have time to "Go all in" on go. Thus goal for this year
+on go is to finish this book and follow through two other books called "Lets Go" and "Lets Go Further". They are tutorial books on web development which is perfect
+for this because major project, college etc.</p>
+<h2 id="major-project">Major Project</h2>
+<p>I'm in my final year of bachelors and we have to do a project this year. With AI becoming more and more relevant these days, we <em>project is done in a group</em>, like everyone else, decided
+to do something in the field of AI is what I would have said if we were not complete idiots. Instead we decided to implement OverlayFS for RedoxOS. You can read the proposal <a href="https://gitlab.com/carboxide/proposal">here</a>.</p>
+<p>Remember how I said that I haven't done any project in rust. Well, a (pseudo) file fystem implementation for a modern micro-kernel based operating system seems like a good first project. <em>also incredebly hard but thats beside the point</em></p>
+<p>I don't know what else to say. The mid-term defence for the project is in less than a month and we still have little clue on where to start. The good thing is that the build system for redox os
+seems to be working fine now.</p>
+<h2 id="honourable-mentions">Honourable Mentions</h2>
+<p>I think I've spent significant amount of time on this post so I'm just going to go through with the rest of the topics fast.</p>
+<h3 id="haskell">Haskell</h3>
+<p>I tried to learn haskell. Why? Function programming and I first tried to learn erlang then switched to haskell for asthetics. Had to leave it when the title defence for major project came about and haven't
+picked it up since.</p>
+<h2 id="where-will-it-go">Where will it go?</h2>
+<p>Now that I have talked about what I have been doing, it only seems fair to talk about what I plan on doing. As for rust and go, the way they are going feels fine. I am doing major project in
+rust so the learn won't stop and the three books for go is fine. Maybe if I finish early with those books, I will so a project but that depends on the status of major project at that time and
+studies too.</p>
+<h3 id="an-organized-workflow">An Organized Workflow</h3>
+<p>I through about ranting anout this here but as I said I have spent enough time for this post so maybe I'll write about it in a future post. The gist of it is that I can't seem to find a consistent
+way to organize notes, todos and all other stuff. Nothing has worked be it obsidian, org-mode, logseq, neovim and markdown. I want to have a workflow that works.</p>
+<p>And that is it. I have said all that I wanted to say. <em>maybe not but there are future posts for that</em></p>
+<p>Bye.</p>
+<p>.</p>
+<p>.</p>
+<p>.</p>
+<br>
+<p>Did I mention that I use Arch BTW.</p>
+
+        </div>
+
+        <div class="date">
+          
+              <time class="dt-published" datetime="2025-07-15T00:00:00Z">
+                  July 15, 2025
+              </time>
+          
+        </div>
+            
+        <div class="tag">
+          
+              
+                  <a class="u-category" href="https://faulty.carboxi.de/tags/rust/">rust</a>
+              
+                  <a class="u-category" href="https://faulty.carboxi.de/tags/go/">go</a>
+              
+                  <a class="u-category" href="https://faulty.carboxi.de/tags/rant/">rant</a>
+              
+                  <a class="u-category" href="https://faulty.carboxi.de/tags/life/">life</a>
+              
+          
+        </div>
+    </div>
+</div>
+
+<div class="spacing"><div>
+
+
+
+
+
+
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+
+
+
+
+
+
+  <section class="next">
+      <h2>Wondering?</h2>
+      <div><p>Maybe explore my <a href="/tags">tags</a> & archives and send me a <a href="https://indieweb.org/Webmention">webmention</a>. Follow the site using <a href="https://faulty.carboxi.de/rss.xml">RSS</a>. Just roam arount a bit.</p></div>
+  </section>
+
+
+<div class="spacing"><div>
+
+<section>
+  
+  
+  
+  
+  
+  <div>
+    <h2 class="latest-month-header">Latest Posts</h2>
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post">
+          <a href="https://faulty.carboxi.de/quit/">I Quit.</a>
+          <span class="separator"></span>
+          <time datetime="2026-02-28">
+            28<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  
+
+  <div>
+    <h3>Posts from July 2025</h3>
+    
+      
+    
+      
+    
+      
+    
+      
+        
+        
+        
+          
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/organizationandmanagement/">Organization and Management</a>
+          <span class="separator"></span>
+          <time datetime="2025-07-21">
+            21<sup>st</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post current-post">
+          <a href="https://faulty.carboxi.de/whatsgoingon/">Whats Going On</a>
+          <span class="separator"></span>
+          <time datetime="2025-07-15">
+            15<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+
+
+  
+  <details class="previous-months-accordion">
+    <summary>Archives</summary>
+    
+    
+    
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2026</span>
+              
+            
+            
+              <span class="month-header">February</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/quit/">I Quit.</a>
+          <span class="separator"></span>
+          <time datetime="2026-02-28">
+            28<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2025</span>
+              
+            
+            
+              <span class="month-header">November</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/x86-64-assembly-part-1-5/">Into the x86_64 land Part 1.5: Memory Layout of Struct</a>
+          <span class="separator"></span>
+          <time datetime="2025-11-28">
+            28<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/x86-64-assembly-part-1/">Into the x86_64 land</a>
+          <span class="separator"></span>
+          <time datetime="2025-11-06">
+            6<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">April</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/goingallin/">Going All In</a>
+          <span class="separator"></span>
+          <time datetime="2025-04-10">
+            10<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">March</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+          
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/horror/">I Love Horror Movies</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-23">
+            23<sup>rd</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/learning/">I love learning things.</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-09">
+            9<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/adhd/">I Do Have Mouth, and Still I Can&#x27;t Scream</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-07">
+            7<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">February</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/aproblemaday5/">A problem a day: Day 5</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-25">
+            25<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/aproblemaday4/">A problem a day: Day 4</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-24">
+            24<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+          
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/aproblemaday3/">A problem a day: Day 3</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-23">
+            23<sup>rd</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+          
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/aproblemaday2/">A problem a day: Day 2</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-22">
+            22<sup>nd</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/aproblemaday/">A problem a day: Day 1</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-20">
+            20<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/hello/">Hello</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-08">
+            8<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/about/">About Me</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-05">
+            5<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2014</span>
+              
+            
+            
+              <span class="month-header">March</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/one/">Template</a>
+          <span class="separator"></span>
+          <time datetime="2014-03-14">
+            14<sup>th</sup>
+          </time>
+        </article>
+      
+    
+  </details>
+</section>
+
+
+</body>
+
+<footer>
+  
+  <p>
+  <a href="/" >Main</a>
+  <a href="/rss.xml">Feed</a>
+  <a href="/author" >Author</a>
+  <a href="/nexus" >Nexus</a>
+  <a href="/now" >Now</a>
+  </p>
+  
+</footer>
+</html>

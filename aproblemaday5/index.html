@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="utf-8">
+    <title>faulty:carboxide</title>
+    <link rel="stylesheet" href="/style.css">
+
+    <link rel="webmention" href="https://webmention.io/faulty.carboxi.de/webmention" />
+
+    
+      <link rel="alternate" type="application/rss+xml" title="RSS" href="https://faulty.carboxi.de/rss.xml">
+    
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 85%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23a1a1a1%22>⌬</text></svg>">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+              // customised options
+              // • auto-render specific keys, e.g.:
+              delimiters: [
+                  {left: '$$', right: '$$', display: true},
+                  {left: '$', right: '$', display: false},
+                  {left: '\\(', right: '\\)', display: false},
+                  {left: '\\[', right: '\\]', display: true}
+              ],
+              // • rendering keys, e.g.:
+              throwOnError : false
+            });
+        });
+    </script>
+</head>
+
+<body>
+    
+
+
+
+
+
+
+
+<div>
+    <div class="h-entry">
+
+    
+  <div class="p-author h-card" style="display: none;">
+    <a class="u-url" href="https:&#x2F;&#x2F;faulty.carboxi.de" rel="me">
+      <a class="u-email" href="mailto:faultypointer@proton.me" rel="me">
+      <img class="u-photo" src="&#x2F;thumbnail.png" alt="faulty">
+      <span class="p-name">faulty</span>
+      <p class="p-note">book</p>
+    </a>
+  </div>
+
+
+    <h1 class="p-name"><a href="https:&#x2F;&#x2F;faulty.carboxi.de">A problem a day: Day 5</a></h1>
+        <a class="u-url" href="https:&#x2F;&#x2F;faulty.carboxi.de&#x2F;aproblemaday5&#x2F;" style="display: none;"></a>
+        <div class="e-content p-content">
+          
+            <h2 id="origin">Origin</h2>
+<h3 id="problem">Problem</h3>
+<p>The <strong>appeal</strong> of a string is the number of <strong>distinct</strong> characters found in the string.</p>
+<ul>
+<li>For example, the appeal of <code>"abbca"</code> is <code>3</code> because it has <code>3</code> distinct characters: <code>'a'</code>, <code>'b'</code>, and <code>'c'</code>.
+Given a string <code>s</code>, return <em>the <strong>total appeal of all of its substrings.</strong></em>
+A <strong>substring</strong> is a contiguous sequence of characters within a string.</li>
+</ul>
+<h3 id="examples">Examples</h3>
+<h4 id="example-1">Example 1</h4>
+<p><strong>Input:</strong> s = "abbca"
+<strong>Output:</strong> 28
+<strong>Explanation:</strong> The following are the substrings of "abbca":</p>
+<ul>
+<li>Substrings of length 1: "a", "b", "b", "c", "a" have an appeal of 1, 1, 1, 1, and 1 respectively. The sum is 5.</li>
+<li>Substrings of length 2: "ab", "bb", "bc", "ca" have an appeal of 2, 1, 2, and 2 respectively. The sum is 7.</li>
+<li>Substrings of length 3: "abb", "bbc", "bca" have an appeal of 2, 2, and 3 respectively. The sum is 7.</li>
+<li>Substrings of length 4: "abbc", "bbca" have an appeal of 3 and 3 respectively. The sum is 6.</li>
+<li>Substrings of length 5: "abbca" has an appeal of 3. The sum is 3.
+The total sum is 5 + 7 + 7 + 6 + 3 = 28.</li>
+</ul>
+<h4 id="example-2">Example 2</h4>
+<p><strong>Input:</strong> s = "code"
+<strong>Output:</strong> 20
+<strong>Explanation:</strong> The following are the substrings of "code":</p>
+<ul>
+<li>Substrings of length 1: "c", "o", "d", "e" have an appeal of 1, 1, 1, and 1 respectively. The sum is 4.</li>
+<li>Substrings of length 2: "co", "od", "de" have an appeal of 2, 2, and 2 respectively. The sum is 6.</li>
+<li>Substrings of length 3: "cod", "ode" have an appeal of 3 and 3 respectively. The sum is 6.</li>
+<li>Substrings of length 4: "code" has an appeal of 4. The sum is 4.
+The total sum is 4 + 6 + 6 + 4 = 20.</li>
+</ul>
+<h3 id="constraints">Constraints</h3>
+<ul>
+<li>$1 &lt;= s.length &lt;= 10^5$</li>
+<li><code>s</code> consists of lowercase English letters.</li>
+</ul>
+<h2 id="journey">Journey</h2>
+<p>To find the appeal of just the string, loop through every element, putting each of them in a set. finally calculate the length of set.
+do this for every substring of length 1 to n</p>
+<p>How many substrings does the string have.
+there are n substrings of size 1
+n-1 substrings of size 2 and so on until 1 substring of size 1
+so total substrings = $\frac{n(n+1)}{2}$
+and we have to check for unique elements for each substring
+so the time complexity is $\mathcal{O}(n^3)$</p>
+<p>so is there a better way. There has to be right?
+the previous loop should help then next one</p>
+<p>I couldn't find a better one for some time so i just tried the above process (code below) and yea time limit exceeded so there is a better solution. I knew there was but i just had to be sure after <a href="https://faulty.carboxi.de/aproblemaday4">yerterday</a>'s disaster of a question.</p>
+<pre data-lang="rust" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="font-weight:bold;color:#3a83e9;">use </span><span>std</span><span style="color:#cdd6f4;">::</span><span>collections</span><span style="color:#cdd6f4;">::</span><span>HashSet</span><span style="color:#cdd6f4;">;
+</span><span style="color:#3577e8;">impl </span><span>Solution </span><span style="color:#cdd6f4;">{
+</span><span>    </span><span style="color:#3577e8;">pub fn </span><span style="color:#2f72e6;">appeal_sum</span><span style="color:#cdd6f4;">(s:</span><span> String</span><span style="color:#cdd6f4;">) -&gt; </span><span style="color:#3577e8;">i64 </span><span style="color:#cdd6f4;">{
+</span><span>        </span><span style="color:#3577e8;">let</span><span> s </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> s</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">as_bytes</span><span style="color:#cdd6f4;">();
+</span><span>        </span><span style="color:#3577e8;">let</span><span> n </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> s</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">len</span><span style="color:#cdd6f4;">();
+</span><span>        </span><span style="color:#3577e8;">let mut</span><span> total_appeal </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> n </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">i64</span><span style="color:#cdd6f4;">;
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">for</span><span> size </span><span style="font-weight:bold;color:#74c7ec;">in </span><span style="color:#fab387;">1</span><span style="font-weight:bold;color:#74c7ec;">..</span><span>n</span><span style="font-weight:bold;color:#74c7ec;">+</span><span style="color:#fab387;">1 </span><span style="color:#cdd6f4;">{
+</span><span>            </span><span style="font-weight:bold;color:#3a83e9;">for</span><span> i </span><span style="font-weight:bold;color:#74c7ec;">in </span><span style="color:#fab387;">0</span><span style="font-weight:bold;color:#74c7ec;">..</span><span>n</span><span style="font-weight:bold;color:#74c7ec;">-</span><span>size </span><span style="color:#cdd6f4;">{
+</span><span>                </span><span style="color:#3577e8;">let mut</span><span> set</span><span style="color:#cdd6f4;">: </span><span>HashSet</span><span style="color:#cdd6f4;">&lt;</span><span style="color:#3577e8;">u8</span><span style="color:#cdd6f4;">&gt; </span><span style="font-weight:bold;color:#74c7ec;">= </span><span>HashSet</span><span style="color:#cdd6f4;">::</span><span>with_capacity</span><span style="color:#cdd6f4;">(</span><span style="color:#fab387;">26</span><span style="color:#cdd6f4;">);
+</span><span>                </span><span style="font-weight:bold;color:#3a83e9;">for</span><span> j </span><span style="font-weight:bold;color:#74c7ec;">in</span><span> i</span><span style="font-weight:bold;color:#74c7ec;">..</span><span>i</span><span style="font-weight:bold;color:#74c7ec;">+</span><span>size</span><span style="font-weight:bold;color:#74c7ec;">+</span><span style="color:#fab387;">1 </span><span style="color:#cdd6f4;">{
+</span><span>                    set</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">insert</span><span style="color:#cdd6f4;">(</span><span>s</span><span style="color:#cdd6f4;">[</span><span>j</span><span style="color:#cdd6f4;">]);                  
+</span><span>                </span><span style="color:#cdd6f4;">}
+</span><span>                total_appeal </span><span style="font-weight:bold;color:#74c7ec;">+=</span><span> set</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">len</span><span style="color:#cdd6f4;">() </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">i64</span><span style="color:#cdd6f4;">;
+</span><span>            </span><span style="color:#cdd6f4;">}
+</span><span>        </span><span style="color:#cdd6f4;">}
+</span><span>        total_appeal
+</span><span>    </span><span style="color:#cdd6f4;">}
+</span><span style="color:#cdd6f4;">}
+</span></code></pre>
+<p>anyway so what is it. what can i do.</p>
+<p>divide and conquer??</p>
+<p>let me try something</p>
+<p>I tried using python to calculate the appeal of a substring to see if it worked. well the time exceeded on this one too. but on a different and bigger size string.</p>
+<pre data-lang="python" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-python "><code class="language-python" data-lang="python"><span style="font-weight:bold;color:#3a83e9;">class </span><span style="color:#f9e2af;">Solution</span><span style="color:#cdd6f4;">:
+</span><span>    </span><span style="font-weight:bold;color:#3a83e9;">def </span><span style="color:#2f72e6;">appealSum</span><span style="color:#cdd6f4;">(self, s: </span><span style="color:#f9e2af;">str</span><span style="color:#cdd6f4;">) -&gt; </span><span style="color:#f9e2af;">int</span><span style="color:#cdd6f4;">:
+</span><span>        n </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#2f72e6;">len</span><span style="color:#cdd6f4;">(</span><span style="color:#2f72e6;">s</span><span style="color:#cdd6f4;">)
+</span><span>        total_appeal </span><span style="font-weight:bold;color:#74c7ec;">= </span><span>n
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">for </span><span>i </span><span style="font-weight:bold;color:#3a83e9;">in </span><span style="color:#2f72e6;">range</span><span style="color:#cdd6f4;">(</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">, </span><span style="color:#2f72e6;">n</span><span style="font-weight:bold;color:#74c7ec;">+</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">):
+</span><span>            </span><span style="font-weight:bold;color:#3a83e9;">for </span><span>j </span><span style="font-weight:bold;color:#3a83e9;">in </span><span style="color:#2f72e6;">range</span><span style="color:#cdd6f4;">(</span><span style="color:#2f72e6;">n</span><span style="font-weight:bold;color:#74c7ec;">-</span><span style="color:#2f72e6;">i</span><span style="color:#cdd6f4;">):
+</span><span>                total_appeal </span><span style="font-weight:bold;color:#74c7ec;">+= </span><span style="color:#2f72e6;">len</span><span style="color:#cdd6f4;">(</span><span style="color:#f9e2af;">set</span><span style="color:#cdd6f4;">(</span><span style="color:#2f72e6;">s</span><span style="color:#cdd6f4;">[</span><span style="color:#2f72e6;">j</span><span style="color:#cdd6f4;">:</span><span style="color:#2f72e6;">j</span><span style="font-weight:bold;color:#74c7ec;">+</span><span style="color:#2f72e6;">i</span><span style="font-weight:bold;color:#74c7ec;">+</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">]))
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">return </span><span>total_appeal
+</span><span>        
+</span></code></pre>
+<p>so python faster than rust. lets goo</p>
+<p>okay i may have spoken too early. the leetcode just showed the last ran test case
+so idk if the python one failed on the larger input and rust on smaller input or not</p>
+<p>my bad
+but i still think the python ones faster. lets see if i can do this in rust</p>
+<pre data-lang="rust" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="font-weight:bold;color:#3a83e9;">use </span><span>std</span><span style="color:#cdd6f4;">::</span><span>collections</span><span style="color:#cdd6f4;">::</span><span>HashSet</span><span style="color:#cdd6f4;">;
+</span><span style="color:#3577e8;">impl </span><span>Solution </span><span style="color:#cdd6f4;">{
+</span><span>    </span><span style="color:#3577e8;">pub fn </span><span style="color:#2f72e6;">appeal_sum</span><span style="color:#cdd6f4;">(s:</span><span> String</span><span style="color:#cdd6f4;">) -&gt; </span><span style="color:#3577e8;">i64 </span><span style="color:#cdd6f4;">{
+</span><span>        </span><span style="color:#3577e8;">let</span><span> s </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> s</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">as_bytes</span><span style="color:#cdd6f4;">();
+</span><span>        </span><span style="color:#3577e8;">let</span><span> n </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> s</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">len</span><span style="color:#cdd6f4;">();
+</span><span>        </span><span style="color:#3577e8;">let mut</span><span> total_appeal </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> n </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">i64</span><span style="color:#cdd6f4;">;
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">for</span><span> size </span><span style="font-weight:bold;color:#74c7ec;">in </span><span style="color:#fab387;">1</span><span style="font-weight:bold;color:#74c7ec;">..</span><span>n </span><span style="font-weight:bold;color:#74c7ec;">+ </span><span style="color:#fab387;">1 </span><span style="color:#cdd6f4;">{
+</span><span>            </span><span style="font-weight:bold;color:#3a83e9;">for</span><span> i </span><span style="font-weight:bold;color:#74c7ec;">in </span><span style="color:#fab387;">0</span><span style="font-weight:bold;color:#74c7ec;">..</span><span>n </span><span style="font-weight:bold;color:#74c7ec;">-</span><span> size </span><span style="color:#cdd6f4;">{
+</span><span>                </span><span style="color:#3577e8;">let</span><span> s</span><span style="color:#cdd6f4;">: </span><span>HashSet</span><span style="color:#cdd6f4;">&lt;</span><span style="color:#3577e8;">u8</span><span style="color:#cdd6f4;">&gt; </span><span style="font-weight:bold;color:#74c7ec;">= </span><span>HashSet</span><span style="color:#cdd6f4;">::</span><span>from_iter</span><span style="color:#cdd6f4;">(</span><span>s</span><span style="color:#cdd6f4;">[</span><span>i</span><span style="font-weight:bold;color:#74c7ec;">..</span><span>i</span><span style="font-weight:bold;color:#74c7ec;">+</span><span>size</span><span style="font-weight:bold;color:#74c7ec;">+</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">].</span><span style="color:#2f72e6;">to_vec</span><span style="color:#cdd6f4;">());
+</span><span>                total_appeal </span><span style="font-weight:bold;color:#74c7ec;">+=</span><span> s</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">len</span><span style="color:#cdd6f4;">() </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">i64</span><span style="color:#cdd6f4;">;
+</span><span>            </span><span style="color:#cdd6f4;">}
+</span><span>        </span><span style="color:#cdd6f4;">}
+</span><span>        total_appeal
+</span><span>    </span><span style="color:#cdd6f4;">}
+</span><span style="color:#cdd6f4;">}
+</span></code></pre>
+<p>still didnt work tho</p>
+<p>there has to be someway to do this in $n^2$ time.
+if only i could find the appeal of the substring in constant time.
+because i don't think i can do this without looping through each substring
+or can i</p>
+<pre data-lang="rust" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="font-weight:bold;color:#3a83e9;">use </span><span>std</span><span style="color:#cdd6f4;">::</span><span>collections</span><span style="color:#cdd6f4;">::</span><span>HashSet</span><span style="color:#cdd6f4;">;
+</span><span style="color:#3577e8;">impl </span><span>Solution </span><span style="color:#cdd6f4;">{
+</span><span>    </span><span style="color:#3577e8;">pub fn </span><span style="color:#2f72e6;">appeal_sum</span><span style="color:#cdd6f4;">(s:</span><span> String</span><span style="color:#cdd6f4;">) -&gt; </span><span style="color:#3577e8;">i64 </span><span style="color:#cdd6f4;">{
+</span><span>        </span><span style="color:#3577e8;">let</span><span> s</span><span style="color:#cdd6f4;">: </span><span style="color:#f9e2af;">Vec</span><span style="color:#cdd6f4;">&lt;</span><span style="color:#3577e8;">u8</span><span style="color:#cdd6f4;">&gt; </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> s</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">chars</span><span style="color:#cdd6f4;">().</span><span style="color:#2f72e6;">map</span><span style="color:#cdd6f4;">(|elem| </span><span>elem </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">u8 </span><span style="font-weight:bold;color:#74c7ec;">- </span><span style="color:#fab387;">97</span><span style="color:#cdd6f4;">).</span><span style="color:#2f72e6;">collect</span><span style="color:#cdd6f4;">();
+</span><span>        </span><span style="color:#3577e8;">let</span><span> n </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> s</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">len</span><span style="color:#cdd6f4;">();
+</span><span>        </span><span style="color:#3577e8;">let mut</span><span> total_appeal </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> n</span><span style="color:#cdd6f4;">;
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">for</span><span> size </span><span style="font-weight:bold;color:#74c7ec;">in </span><span style="color:#fab387;">1</span><span style="font-weight:bold;color:#74c7ec;">..</span><span>n </span><span style="color:#cdd6f4;">{
+</span><span>            </span><span style="color:#3577e8;">let mut</span><span> set</span><span style="color:#cdd6f4;">: </span><span>HashSet</span><span style="color:#cdd6f4;">&lt;</span><span style="color:#3577e8;">u8</span><span style="color:#cdd6f4;">&gt; </span><span style="font-weight:bold;color:#74c7ec;">= </span><span>HashSet</span><span style="color:#cdd6f4;">::</span><span>with_capacity</span><span style="color:#cdd6f4;">(</span><span style="color:#fab387;">26</span><span style="color:#cdd6f4;">);
+</span><span>            </span><span style="color:#3577e8;">let mut</span><span> counts</span><span style="color:#cdd6f4;">: [</span><span style="color:#3577e8;">usize</span><span style="color:#cdd6f4;">; </span><span style="color:#fab387;">26</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">; </span><span style="color:#fab387;">26</span><span style="color:#cdd6f4;">];
+</span><span>            </span><span style="font-weight:bold;color:#3a83e9;">for</span><span> j </span><span style="font-weight:bold;color:#74c7ec;">in </span><span style="color:#fab387;">0</span><span style="font-weight:bold;color:#74c7ec;">..</span><span>size </span><span style="color:#cdd6f4;">{
+</span><span>                counts</span><span style="color:#cdd6f4;">[</span><span>s</span><span style="color:#cdd6f4;">[</span><span>j</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">usize</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">+= </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">;
+</span><span>                set</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">insert</span><span style="color:#cdd6f4;">(</span><span>s</span><span style="color:#cdd6f4;">[</span><span>j</span><span style="color:#cdd6f4;">]);
+</span><span>
+</span><span>            </span><span style="color:#cdd6f4;">}
+</span><span>            </span><span style="font-weight:bold;color:#3a83e9;">for</span><span> i </span><span style="font-weight:bold;color:#74c7ec;">in</span><span> size</span><span style="font-weight:bold;color:#74c7ec;">..</span><span>n </span><span style="color:#cdd6f4;">{
+</span><span>                set</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">insert</span><span style="color:#cdd6f4;">(</span><span>s</span><span style="color:#cdd6f4;">[</span><span>i</span><span style="color:#cdd6f4;">]);
+</span><span>                counts</span><span style="color:#cdd6f4;">[</span><span>s</span><span style="color:#cdd6f4;">[</span><span>i</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">usize</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">+= </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">;
+</span><span>                total_appeal </span><span style="font-weight:bold;color:#74c7ec;">+=</span><span> set</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">len</span><span style="color:#cdd6f4;">();
+</span><span>                </span><span style="font-weight:bold;color:#3a83e9;">if</span><span> counts</span><span style="color:#cdd6f4;">[</span><span>s</span><span style="color:#cdd6f4;">[</span><span>i</span><span style="font-weight:bold;color:#74c7ec;">-</span><span>size</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">usize</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">== </span><span style="color:#fab387;">1 </span><span style="color:#cdd6f4;">{
+</span><span>                    set</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">remove</span><span style="color:#cdd6f4;">(</span><span style="font-weight:bold;color:#74c7ec;">&amp;</span><span>s</span><span style="color:#cdd6f4;">[</span><span>i</span><span style="font-weight:bold;color:#74c7ec;">-</span><span>size</span><span style="color:#cdd6f4;">]);
+</span><span>                </span><span style="color:#cdd6f4;">}
+</span><span>                counts</span><span style="color:#cdd6f4;">[</span><span>s</span><span style="color:#cdd6f4;">[</span><span>i</span><span style="font-weight:bold;color:#74c7ec;">-</span><span>size</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">usize</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">-= </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">;
+</span><span>            </span><span style="color:#cdd6f4;">}
+</span><span>        </span><span style="color:#cdd6f4;">}
+</span><span>        total_appeal </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">i64
+</span><span>    </span><span style="color:#cdd6f4;">}
+</span><span style="color:#cdd6f4;">}
+</span></code></pre>
+<p>this one definitely passed the testcase the previous two didn't pass. but it was still not enough.
+but why</p>
+<p>is this really some divide and conquer bs that im not getting</p>
+<p>im really lost with this one</p>
+<p>i think im gonna dip.</p>
+<p>i used flamegraph and i think it said 95% time is taken by the HashSet.insert() function call.
+I'll try to thing of a way to not use hashset or</p>
+<pre data-lang="rust" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#3577e8;">pub fn </span><span style="color:#2f72e6;">appeal_sum</span><span style="color:#cdd6f4;">(s:</span><span> String</span><span style="color:#cdd6f4;">) -&gt; </span><span style="color:#3577e8;">i64 </span><span style="color:#cdd6f4;">{
+</span><span>    </span><span style="color:#3577e8;">let</span><span> s</span><span style="color:#cdd6f4;">: </span><span style="color:#f9e2af;">Vec</span><span style="color:#cdd6f4;">&lt;</span><span style="color:#3577e8;">u8</span><span style="color:#cdd6f4;">&gt; </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> s</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">chars</span><span style="color:#cdd6f4;">().</span><span style="color:#2f72e6;">map</span><span style="color:#cdd6f4;">(|elem| </span><span>elem </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">u8 </span><span style="font-weight:bold;color:#74c7ec;">- </span><span style="color:#fab387;">97</span><span style="color:#cdd6f4;">).</span><span style="color:#2f72e6;">collect</span><span style="color:#cdd6f4;">();
+</span><span>    </span><span style="color:#3577e8;">let</span><span> n </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> s</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">len</span><span style="color:#cdd6f4;">();
+</span><span>    </span><span style="color:#3577e8;">let mut</span><span> total_appeal </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> n</span><span style="color:#cdd6f4;">;
+</span><span>    </span><span style="font-weight:bold;color:#3a83e9;">for</span><span> size </span><span style="font-weight:bold;color:#74c7ec;">in </span><span style="color:#fab387;">1</span><span style="font-weight:bold;color:#74c7ec;">..</span><span>n </span><span style="color:#cdd6f4;">{
+</span><span>        </span><span style="color:#3577e8;">let mut</span><span> set</span><span style="color:#cdd6f4;">: </span><span>HashSet</span><span style="color:#cdd6f4;">&lt;</span><span style="color:#3577e8;">u8</span><span style="color:#cdd6f4;">&gt; </span><span style="font-weight:bold;color:#74c7ec;">= </span><span>HashSet</span><span style="color:#cdd6f4;">::</span><span>with_capacity</span><span style="color:#cdd6f4;">(</span><span style="color:#fab387;">26</span><span style="color:#cdd6f4;">);
+</span><span>        </span><span style="color:#3577e8;">let mut</span><span> counts</span><span style="color:#cdd6f4;">: [</span><span style="color:#3577e8;">usize</span><span style="color:#cdd6f4;">; </span><span style="color:#fab387;">26</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">; </span><span style="color:#fab387;">26</span><span style="color:#cdd6f4;">];
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">for</span><span> j </span><span style="font-weight:bold;color:#74c7ec;">in </span><span style="color:#fab387;">0</span><span style="font-weight:bold;color:#74c7ec;">..</span><span>size </span><span style="color:#cdd6f4;">{
+</span><span>            </span><span style="color:#3577e8;">let</span><span> idx </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> s</span><span style="color:#cdd6f4;">[</span><span>j</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">usize</span><span style="color:#cdd6f4;">;
+</span><span>            counts</span><span style="color:#cdd6f4;">[</span><span>idx</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">+= </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">;
+</span><span>            </span><span style="font-weight:bold;color:#3a83e9;">if</span><span> counts</span><span style="color:#cdd6f4;">[</span><span>idx</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">&lt;= </span><span style="color:#fab387;">1 </span><span style="color:#cdd6f4;">{
+</span><span>                set</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">insert</span><span style="color:#cdd6f4;">(</span><span>s</span><span style="color:#cdd6f4;">[</span><span>j</span><span style="color:#cdd6f4;">]);
+</span><span>            </span><span style="color:#cdd6f4;">}
+</span><span>        </span><span style="color:#cdd6f4;">}
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">for</span><span> i </span><span style="font-weight:bold;color:#74c7ec;">in</span><span> size</span><span style="font-weight:bold;color:#74c7ec;">..</span><span>n </span><span style="color:#cdd6f4;">{
+</span><span>            </span><span style="color:#3577e8;">let</span><span> idx </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> s</span><span style="color:#cdd6f4;">[</span><span>i</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">usize</span><span style="color:#cdd6f4;">;
+</span><span>            counts</span><span style="color:#cdd6f4;">[</span><span>s</span><span style="color:#cdd6f4;">[</span><span>i</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">usize</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">+= </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">;
+</span><span>            </span><span style="font-weight:bold;color:#3a83e9;">if</span><span> counts</span><span style="color:#cdd6f4;">[</span><span>idx</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">&lt;= </span><span style="color:#fab387;">1 </span><span style="color:#cdd6f4;">{
+</span><span>                set</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">insert</span><span style="color:#cdd6f4;">(</span><span>s</span><span style="color:#cdd6f4;">[</span><span>i</span><span style="color:#cdd6f4;">]);
+</span><span>            </span><span style="color:#cdd6f4;">}
+</span><span>            total_appeal </span><span style="font-weight:bold;color:#74c7ec;">+=</span><span> set</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">len</span><span style="color:#cdd6f4;">();
+</span><span>            </span><span style="font-weight:bold;color:#3a83e9;">if</span><span> counts</span><span style="color:#cdd6f4;">[</span><span>s</span><span style="color:#cdd6f4;">[</span><span>i </span><span style="font-weight:bold;color:#74c7ec;">-</span><span> size</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">usize</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">== </span><span style="color:#fab387;">1 </span><span style="color:#cdd6f4;">{
+</span><span>                set</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">remove</span><span style="color:#cdd6f4;">(</span><span style="font-weight:bold;color:#74c7ec;">&amp;</span><span>s</span><span style="color:#cdd6f4;">[</span><span>i </span><span style="font-weight:bold;color:#74c7ec;">-</span><span> size</span><span style="color:#cdd6f4;">]);
+</span><span>            </span><span style="color:#cdd6f4;">}
+</span><span>            counts</span><span style="color:#cdd6f4;">[</span><span>s</span><span style="color:#cdd6f4;">[</span><span>i </span><span style="font-weight:bold;color:#74c7ec;">-</span><span> size</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">usize</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">-= </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">;
+</span><span>        </span><span style="color:#cdd6f4;">}
+</span><span>    </span><span style="color:#cdd6f4;">}
+</span><span>    total_appeal </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">i64
+</span><span style="color:#cdd6f4;">}
+</span></code></pre>
+<p>only insert if there isnt already stuff in it. which i feel like made it fast but not enough</p>
+<p>I think this is it for today.
+maybe ill continue this tomorrow or some other day</p>
+
+        </div>
+
+        <div class="date">
+          
+              <time class="dt-published" datetime="2025-02-25T00:00:00Z">
+                  February 25, 2025
+              </time>
+          
+        </div>
+            
+        <div class="tag">
+          
+              
+                  <a class="u-category" href="https://faulty.carboxi.de/tags/algorithm/">algorithm</a>
+              
+                  <a class="u-category" href="https://faulty.carboxi.de/tags/a-problem-a-day/">a-problem-a-day</a>
+              
+          
+        </div>
+    </div>
+</div>
+
+<div class="spacing"><div>
+
+
+
+
+
+
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+
+
+
+
+
+
+  <section class="next">
+      <h2>Wondering?</h2>
+      <div><p>Maybe explore my <a href="/tags">tags</a> & archives and send me a <a href="https://indieweb.org/Webmention">webmention</a>. Follow the site using <a href="https://faulty.carboxi.de/rss.xml">RSS</a>. Just roam arount a bit.</p></div>
+  </section>
+
+
+<div class="spacing"><div>
+
+<section>
+  
+  
+  
+  
+  
+
+  <div>
+    <h3>Posts from February 2025</h3>
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post current-post">
+          <a href="https://faulty.carboxi.de/aproblemaday5/">A problem a day: Day 5</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-25">
+            25<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/aproblemaday4/">A problem a day: Day 4</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-24">
+            24<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+          
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/aproblemaday3/">A problem a day: Day 3</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-23">
+            23<sup>rd</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+          
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/aproblemaday2/">A problem a day: Day 2</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-22">
+            22<sup>nd</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/aproblemaday/">A problem a day: Day 1</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-20">
+            20<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/hello/">Hello</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-08">
+            8<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/about/">About Me</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-05">
+            5<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+    
+  </div>
+
+
+  
+  <details class="previous-months-accordion">
+    <summary>Archives</summary>
+    
+    
+    
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2026</span>
+              
+            
+            
+              <span class="month-header">February</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/quit/">I Quit.</a>
+          <span class="separator"></span>
+          <time datetime="2026-02-28">
+            28<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2025</span>
+              
+            
+            
+              <span class="month-header">November</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/x86-64-assembly-part-1-5/">Into the x86_64 land Part 1.5: Memory Layout of Struct</a>
+          <span class="separator"></span>
+          <time datetime="2025-11-28">
+            28<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/x86-64-assembly-part-1/">Into the x86_64 land</a>
+          <span class="separator"></span>
+          <time datetime="2025-11-06">
+            6<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">July</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+          
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/organizationandmanagement/">Organization and Management</a>
+          <span class="separator"></span>
+          <time datetime="2025-07-21">
+            21<sup>st</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/whatsgoingon/">Whats Going On</a>
+          <span class="separator"></span>
+          <time datetime="2025-07-15">
+            15<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">April</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/goingallin/">Going All In</a>
+          <span class="separator"></span>
+          <time datetime="2025-04-10">
+            10<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">March</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+          
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/horror/">I Love Horror Movies</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-23">
+            23<sup>rd</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/learning/">I love learning things.</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-09">
+            9<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/adhd/">I Do Have Mouth, and Still I Can&#x27;t Scream</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-07">
+            7<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2014</span>
+              
+            
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/one/">Template</a>
+          <span class="separator"></span>
+          <time datetime="2014-03-14">
+            14<sup>th</sup>
+          </time>
+        </article>
+      
+    
+  </details>
+</section>
+
+
+</body>
+
+<footer>
+  
+  <p>
+  <a href="/" >Main</a>
+  <a href="/rss.xml">Feed</a>
+  <a href="/author" >Author</a>
+  <a href="/nexus" >Nexus</a>
+  <a href="/now" >Now</a>
+  </p>
+  
+</footer>
+</html>

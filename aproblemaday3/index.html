@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="utf-8">
+    <title>faulty:carboxide</title>
+    <link rel="stylesheet" href="/style.css">
+
+    <link rel="webmention" href="https://webmention.io/faulty.carboxi.de/webmention" />
+
+    
+      <link rel="alternate" type="application/rss+xml" title="RSS" href="https://faulty.carboxi.de/rss.xml">
+    
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 85%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23a1a1a1%22>⌬</text></svg>">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+              // customised options
+              // • auto-render specific keys, e.g.:
+              delimiters: [
+                  {left: '$$', right: '$$', display: true},
+                  {left: '$', right: '$', display: false},
+                  {left: '\\(', right: '\\)', display: false},
+                  {left: '\\[', right: '\\]', display: true}
+              ],
+              // • rendering keys, e.g.:
+              throwOnError : false
+            });
+        });
+    </script>
+</head>
+
+<body>
+    
+
+
+
+
+
+
+
+<div>
+    <div class="h-entry">
+
+    
+  <div class="p-author h-card" style="display: none;">
+    <a class="u-url" href="https:&#x2F;&#x2F;faulty.carboxi.de" rel="me">
+      <a class="u-email" href="mailto:faultypointer@proton.me" rel="me">
+      <img class="u-photo" src="&#x2F;thumbnail.png" alt="faulty">
+      <span class="p-name">faulty</span>
+      <p class="p-note">book</p>
+    </a>
+  </div>
+
+
+    <h1 class="p-name"><a href="https:&#x2F;&#x2F;faulty.carboxi.de">A problem a day: Day 3</a></h1>
+        <a class="u-url" href="https:&#x2F;&#x2F;faulty.carboxi.de&#x2F;aproblemaday3&#x2F;" style="display: none;"></a>
+        <div class="e-content p-content">
+          
+            <h2 id="origin">Origin</h2>
+<p>url: <a href="https://leetcode.com/problems/smallest-good-base/description/">Leetcode: Problem no. 483</a></p>
+<h3 id="problem">Problem</h3>
+<p>Given an integer <code>n</code> represented as a string, return <em>the smallest <strong>good base</strong> of</em> <code>n</code>.
+We call <code>k &gt;= 2</code> a <strong>good base</strong> of <code>n</code>, if all digits of <code>n</code> base <code>k</code> are <code>1</code>'s.</p>
+<h3 id="examples">Examples</h3>
+<h4 id="example-1">Example 1</h4>
+<ul>
+<li><strong>Input:</strong> n = "13"</li>
+<li><strong>Output:</strong> "3"</li>
+<li><strong>Explanation:</strong> 13 base 3 is 111.</li>
+</ul>
+<h4 id="example-2">Example 2</h4>
+<ul>
+<li><strong>Input:</strong> n = "4681"</li>
+<li><strong>Output:</strong> "8"</li>
+<li><strong>Explanation:</strong> 4681 base 8 is 11111.</li>
+</ul>
+<h4 id="example-3">Example 3</h4>
+<ul>
+<li><strong>Input:</strong> n = "1000000000000000000"</li>
+<li><strong>Output:</strong> "999999999999999999"</li>
+<li><strong>Explanation:</strong> 1000000000000000000 base 999999999999999999 is 11.</li>
+</ul>
+<h3 id="constraints">Constraints</h3>
+<ul>
+<li><code>n</code> is an integer in the range $[3, 10^{18}]$.</li>
+<li><code>n</code> does not contain any leading zeros.</li>
+</ul>
+<h2 id="journey">Journey</h2>
+<p>I'd like to believe there is a formula for this.
+Every digit should be 1 so
+$$
+n = \sum_{p=0}^t k^p
+$$
+I need to find out what k is. I don't know that <code>t</code> gives the smallest <code>k</code> for a given <code>n</code>. I do know that for <code>t=1</code>
+$n = k^0 + k^1$
+$k = n-1$
+so t = 1 gives the largest (and is some cases like example 3 above the only) base <code>k</code> for which all the digits are 1.</p>
+<p>I also know that as I keep increasing t, then I will keep finding a <code>k</code> smaller than the previous one (if it exists).
+But where do I stop? or better yet where do I begin high and keep decreasing <code>t</code> until I find a valid <code>k</code>
+since $k \ge 2$, we can find the largest t where k is 2.
+$$
+\begin{align*}
+n &amp;= \sum_{p=0}^t 2^p \\
+n &amp;= 2^0 + 2^1 + 2^2 + ... + 2^t \\
+n &amp;= \frac{1-2^{t+1}}{1-2} \\
+n &amp;= 2^{t+1} - 1 \\
+t+1 &amp;= \log_2(n+1) \\
+t &amp;= \log_2(\frac{n+1}{2})
+\end{align*}
+$$
+so we can start at <code>t</code> equal to the above value, and <code>k=2</code> we can compute $n\prime$ as
+$$
+n\prime = \frac{k^{t+1} -1}{k-1}
+$$
+Now if this $n\prime$ is equal to the given n then we have found that the good base <code>k</code>. If not, then there are two cases. If $n\prime \le n$, then we should increment <code>k</code> otherwise decrement <code>t</code>. Now the solution seems innocent enough.</p>
+<p>Remember that in the worst case we have to go from <code>k=2</code> go k = <code>n-1</code> and thats not all. We are iterating over <code>t</code> which starts at the log of <code>n+1</code> and stops at <code>t=2</code>. For simplification, lets say that we check for all values of <code>k</code> in range [2, n-1], for all values of <code>t</code> in range $[log_2{(n+1)/2}, 2]$. Then the worst case time complexity is $\mathcal{O}(n log(n))$.</p>
+<p>Which doesn't seem much. The sorting algorithms are $\mathcal{O}(n log(n))$.  But look at the constraints. The n can be as high as $10^{18}$.  Now my laptop has a cpu with speed of 2GHz. (forget about how many processors ans such for now). That means that it can run a maximum of $2*10^9$ clock cycles per second(also forgetting about boost and overclock because I also don't know). Lets be very very very optimistic here and suppose that every operation in that algorithm takes a single clock cycle<em class="inner-voice">I may not know hardware stuff very much but I did have microprocessor as a subject in one of semester. So trust me when I say this would have been the biggest lie I've ever told if it wasn't for the next line.</em>. Lets also suppose that the line of code translates 1:1 to operations then the code below (in python).</p>
+<pre data-lang="python" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-python "><code class="language-python" data-lang="python"><span style="font-weight:bold;color:#3a83e9;">def </span><span style="color:#2f72e6;">good_base</span><span style="color:#cdd6f4;">(n: </span><span style="color:#f9e2af;">float</span><span style="color:#cdd6f4;">):
+</span><span>    t </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#2f72e6;">math</span><span style="color:#cdd6f4;">.floor(</span><span style="color:#2f72e6;">math</span><span style="color:#cdd6f4;">.log2((</span><span style="color:#2f72e6;">n</span><span style="font-weight:bold;color:#74c7ec;">+</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">) </span><span style="font-weight:bold;color:#74c7ec;">/ </span><span style="color:#fab387;">2</span><span style="color:#cdd6f4;">))
+</span><span>    k </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#fab387;">2
+</span><span>    </span><span style="font-weight:bold;color:#3a83e9;">while </span><span style="color:#eba0ac;">True</span><span style="color:#cdd6f4;">:
+</span><span>        n_prime </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#cdd6f4;">(</span><span style="color:#2f72e6;">math</span><span style="color:#cdd6f4;">.pow(</span><span style="color:#2f72e6;">k</span><span style="color:#cdd6f4;">, </span><span style="color:#2f72e6;">t</span><span style="font-weight:bold;color:#74c7ec;">+</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">) </span><span style="font-weight:bold;color:#74c7ec;">- </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">) </span><span style="font-weight:bold;color:#74c7ec;">/ </span><span style="color:#cdd6f4;">(</span><span>k</span><span style="font-weight:bold;color:#74c7ec;">-</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">)
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">if </span><span>n_prime </span><span style="font-weight:bold;color:#74c7ec;">== </span><span>n</span><span style="color:#cdd6f4;">:
+</span><span>            </span><span style="font-weight:bold;color:#3a83e9;">break
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">elif </span><span>n_prime </span><span style="font-weight:bold;color:#74c7ec;">&lt; </span><span>n</span><span style="color:#cdd6f4;">:
+</span><span>            k</span><span style="font-weight:bold;color:#74c7ec;">+=</span><span style="color:#fab387;">1
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">else</span><span style="color:#cdd6f4;">:
+</span><span>            t</span><span style="font-weight:bold;color:#74c7ec;">-=</span><span style="color:#fab387;">1
+</span><span>    </span><span style="font-weight:bold;color:#3a83e9;">return </span><span>k
+</span></code></pre>
+<p>Then the loop of 8 lines takes about $\frac{8n}{2*10^{9}}$ seconds to run. For numbers less than $10^9$, it takes less than a second. Why bother with the numbers in between, lets go straight to the last one. It takes about $4000000000$ seconds. That is, it takes $126.84$ years for this hugely oversimplified and optimistic imaginary computational model to find out that the required k is $10^{18} -1$.</p>
+<p>So what to do. what to do.</p>
+<p>aha. Good old binary search to the rescue
+why do i have to search the the numbers for k 2 through n-1. what i can do is
+check for every t from the maximum one given by $\log_2(\frac{n+1}{2})$ down to 1
+if k = 2 results in $n\prime = n$. if it does we have found the smallest good base if not we have to go for the middle one. so what is the middle one
+$$
+k_{mid} = \frac{k_0(2)+?}{2}
+$$
+we need to figure out the maximum k. Now could just use <code>n-1</code>. if we are doing binary search then we only check the log(n) numbers.
+$log_2(10^{18}) = 59.79$
+and we have to check that max t to 1 and max t is also given by log base 2 of n. So the number of elements we are checking for the maximum n defined for this problem is nearly $60*60=3600$. compare that with $60 * 10 ^{18}$ we were doing earlier.
+Lo and behold</p>
+<pre data-lang="python" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-python "><code class="language-python" data-lang="python"><span style="font-weight:bold;color:#3a83e9;">import </span><span>math
+</span><span style="font-weight:bold;color:#3a83e9;">def </span><span style="color:#2f72e6;">good_base2</span><span style="color:#cdd6f4;">(n):
+</span><span>    </span><span style="font-weight:bold;color:#3a83e9;">if </span><span>n </span><span style="font-weight:bold;color:#74c7ec;">&lt; </span><span style="color:#fab387;">2</span><span style="color:#cdd6f4;">:
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">return </span><span style="color:#fab387;">1
+</span><span>    t </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#fab387;">0
+</span><span>    temp </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#cdd6f4;">(</span><span>n </span><span style="font-weight:bold;color:#74c7ec;">+ </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">) </span><span style="font-weight:bold;color:#74c7ec;">// </span><span style="color:#fab387;">2
+</span><span>    </span><span style="font-weight:bold;color:#3a83e9;">while </span><span>temp </span><span style="font-weight:bold;color:#74c7ec;">&gt; </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">:
+</span><span>        temp </span><span style="font-weight:bold;color:#74c7ec;">//= </span><span style="color:#fab387;">2
+</span><span>        t </span><span style="font-weight:bold;color:#74c7ec;">+= </span><span style="color:#fab387;">1
+</span><span>    found </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#eba0ac;">False
+</span><span>    </span><span style="font-weight:bold;color:#3a83e9;">while </span><span style="font-weight:bold;color:#74c7ec;">not </span><span>found </span><span style="font-weight:bold;color:#74c7ec;">and </span><span>t </span><span style="font-weight:bold;color:#74c7ec;">&gt;= </span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">:
+</span><span>        k </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#fab387;">2
+</span><span>        k_m </span><span style="font-weight:bold;color:#74c7ec;">= </span><span>n
+</span><span>        prev_k </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#fab387;">1
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">while </span><span>k </span><span style="font-weight:bold;color:#74c7ec;">&lt; </span><span>n</span><span style="color:#cdd6f4;">:
+</span><span>            numerator </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#2f72e6;">pow</span><span style="color:#cdd6f4;">(</span><span style="color:#2f72e6;">k</span><span style="color:#cdd6f4;">, </span><span style="color:#2f72e6;">t </span><span style="font-weight:bold;color:#74c7ec;">+ </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">) </span><span style="font-weight:bold;color:#74c7ec;">- </span><span style="color:#fab387;">1
+</span><span>            denominator </span><span style="font-weight:bold;color:#74c7ec;">= </span><span>k </span><span style="font-weight:bold;color:#74c7ec;">- </span><span style="color:#fab387;">1
+</span><span>            n_prime </span><span style="font-weight:bold;color:#74c7ec;">= </span><span>numerator </span><span style="font-weight:bold;color:#74c7ec;">// </span><span>denominator            
+</span><span>            </span><span style="font-weight:bold;color:#3a83e9;">if </span><span>n_prime </span><span style="font-weight:bold;color:#74c7ec;">== </span><span>n</span><span style="color:#cdd6f4;">:
+</span><span>                found </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#eba0ac;">True
+</span><span>                </span><span style="font-weight:bold;color:#3a83e9;">break
+</span><span>            </span><span style="font-weight:bold;color:#3a83e9;">elif </span><span>n_prime </span><span style="font-weight:bold;color:#74c7ec;">&lt; </span><span>n</span><span style="color:#cdd6f4;">:
+</span><span>                prev_k </span><span style="font-weight:bold;color:#74c7ec;">= </span><span>k
+</span><span>                k </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#cdd6f4;">(</span><span>k </span><span style="font-weight:bold;color:#74c7ec;">+ </span><span>k_m</span><span style="color:#cdd6f4;">) </span><span style="font-weight:bold;color:#74c7ec;">// </span><span style="color:#fab387;">2
+</span><span>            </span><span style="font-weight:bold;color:#3a83e9;">else</span><span style="color:#cdd6f4;">:
+</span><span>                k_m </span><span style="font-weight:bold;color:#74c7ec;">= </span><span>k
+</span><span>                k </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#cdd6f4;">(</span><span>prev_k </span><span style="font-weight:bold;color:#74c7ec;">+ </span><span>k_m</span><span style="color:#cdd6f4;">) </span><span style="font-weight:bold;color:#74c7ec;">// </span><span style="color:#fab387;">2
+</span><span>            </span><span style="font-weight:bold;color:#3a83e9;">if </span><span>prev_k </span><span style="font-weight:bold;color:#74c7ec;">== </span><span>k</span><span style="color:#cdd6f4;">:
+</span><span>                t </span><span style="font-weight:bold;color:#74c7ec;">-= </span><span style="color:#fab387;">1
+</span><span>                </span><span style="font-weight:bold;color:#3a83e9;">break
+</span><span>    </span><span style="font-weight:bold;color:#3a83e9;">return </span><span>k 
+</span></code></pre>
+<p>an imaginary and hopefully delusional time of 126 years to
+<img src="/images/apad3-sol2-time.png" alt="Running time of solution 2 to n = 10^18" /></p>
+<p>but we can do better. atleast theoretically. It does involve computing square root.
+What am I taking about?
+well you see how we computed the maximum t given a n.
+we can also do the opposite. we can compute the maximum <code>k</code> for a given <code>t</code> such that any value of k more than this will make <code>n prime</code> greater than <code>n</code>.
+we have
+$$
+n = k^0 + k ^1 + k^2 + .... + k^t
+$$
+lets us ignore all the expression of <code>k</code> before $k^t$ so it becomes
+$$
+\begin{aligned}
+n = k^t \
+k = \sqrt[t]{n}
+\end{aligned}
+$$
+for any k greater than this would make the calculated n prime greater than n.
+as a bonus we can just check with the final value as $\sqrt[t]{n}$ and if the calculated n is smaller than given n then we just go to the next t. What if its bigger than the given then we just subtract one from the calculated <code>k</code> for this t ($\sqrt[t]{n}$).</p>
+<pre data-lang="python" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-python "><code class="language-python" data-lang="python"><span style="font-weight:bold;color:#3a83e9;">def </span><span style="color:#2f72e6;">good_base3</span><span style="color:#cdd6f4;">(n):
+</span><span>    </span><span style="font-weight:bold;color:#3a83e9;">if </span><span>n </span><span style="font-weight:bold;color:#74c7ec;">&lt; </span><span style="color:#fab387;">2</span><span style="color:#cdd6f4;">:
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">return </span><span style="color:#fab387;">1
+</span><span>    t </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#fab387;">0
+</span><span>    temp </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#cdd6f4;">(</span><span>n </span><span style="font-weight:bold;color:#74c7ec;">+ </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">) </span><span style="font-weight:bold;color:#74c7ec;">// </span><span style="color:#fab387;">2
+</span><span>    </span><span style="font-weight:bold;color:#3a83e9;">while </span><span>temp </span><span style="font-weight:bold;color:#74c7ec;">&gt; </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">:
+</span><span>        temp </span><span style="font-weight:bold;color:#74c7ec;">//= </span><span style="color:#fab387;">2
+</span><span>        t </span><span style="font-weight:bold;color:#74c7ec;">+= </span><span style="color:#fab387;">1
+</span><span>    k </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#2f72e6;">math</span><span style="color:#cdd6f4;">.floor(</span><span style="color:#2f72e6;">n </span><span style="font-weight:bold;color:#74c7ec;">** </span><span style="color:#cdd6f4;">(</span><span style="color:#fab387;">1</span><span style="font-weight:bold;color:#74c7ec;">/</span><span style="color:#2f72e6;">t</span><span style="color:#cdd6f4;">))
+</span><span>    </span><span style="font-weight:bold;color:#3a83e9;">while </span><span>t </span><span style="font-weight:bold;color:#74c7ec;">&gt; </span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">:
+</span><span>        numerator </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#2f72e6;">pow</span><span style="color:#cdd6f4;">(</span><span style="color:#2f72e6;">k</span><span style="color:#cdd6f4;">, </span><span style="color:#2f72e6;">t </span><span style="font-weight:bold;color:#74c7ec;">+ </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">) </span><span style="font-weight:bold;color:#74c7ec;">- </span><span style="color:#fab387;">1
+</span><span>        denominator </span><span style="font-weight:bold;color:#74c7ec;">= </span><span>k </span><span style="font-weight:bold;color:#74c7ec;">- </span><span style="color:#fab387;">1
+</span><span>        n_prime </span><span style="font-weight:bold;color:#74c7ec;">= </span><span>numerator </span><span style="font-weight:bold;color:#74c7ec;">// </span><span>denominator
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">if </span><span style="color:#cdd6f4;">(</span><span>n_prime </span><span style="font-weight:bold;color:#74c7ec;">== </span><span>n</span><span style="color:#cdd6f4;">):
+</span><span>            </span><span style="font-weight:bold;color:#3a83e9;">break
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">if </span><span style="color:#cdd6f4;">(</span><span>n_prime </span><span style="font-weight:bold;color:#74c7ec;">&gt; </span><span>n</span><span style="color:#cdd6f4;">):
+</span><span>            k </span><span style="font-weight:bold;color:#74c7ec;">-= </span><span style="color:#fab387;">1
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">else</span><span style="color:#cdd6f4;">:
+</span><span>            t</span><span style="font-weight:bold;color:#74c7ec;">-=</span><span style="color:#fab387;">1
+</span><span>            k </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#2f72e6;">math</span><span style="color:#cdd6f4;">.floor(</span><span style="color:#2f72e6;">n </span><span style="font-weight:bold;color:#74c7ec;">** </span><span style="color:#cdd6f4;">(</span><span style="color:#fab387;">1</span><span style="font-weight:bold;color:#74c7ec;">/</span><span style="color:#2f72e6;">t</span><span style="color:#cdd6f4;">))
+</span><span>    </span><span style="font-weight:bold;color:#3a83e9;">return </span><span>k 
+</span></code></pre>
+<p><img src="/images/apad3-sol3-time.png" alt="Running time of solution 3 to n = 10^18" /></p>
+<p>And I wanted to calculate how many iterations each one took.
+The <code>good_base2</code> took a total of 3511 iterations while the <code>good_base3</code> took 62 iterations. This make me not sure about the correctness of the last one. I mean I could just try it on leetcode and see. Also I have been avoiding the String thing in the questions. I'm assuming I can just parse the string as u128 in rust.
+okay second one is definetely wrong.
+well it wasn't wrong the floats caused the error. if t ever becomes 1, the float power function to calculate k cannot
+store the value exactly. (this was the problem in both rust and python). rust has f128 which didn't cause this issue but thats not a stable feature so i could not use that.
+anyway if it t becomes 1 then we know the answer is n-1 so i run the loop until t is greater than 1.
+when the loop exit, I know if it exited by finding the value or if t reaching one. I used bool found for that but as im writing this I realize I could have just checked t is 1 or not.
+also python solution also caused the floating point approximation error. so does that mean python stores floating point as 64 bits too.</p>
+<p>and why didn't this happen for the number $10^{18}$ but for a complete random number.
+I think this could all be explained if I made some proof and explaination of the problem but then again I'm really not in the mood. so</p>
+<h2 id="destination">Destination</h2>
+<p>I don't really know what to write here. I mean usually I write how the solution works but for this one I feel like I've already explained everything in the [[#Journey]] section above. So have a look at the solution in rust.</p>
+<pre data-lang="rust" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#3577e8;">impl </span><span>Solution </span><span style="color:#cdd6f4;">{
+</span><span>    </span><span style="color:#3577e8;">pub fn </span><span style="color:#2f72e6;">smallest_good_base</span><span style="color:#cdd6f4;">(n:</span><span> String</span><span style="color:#cdd6f4;">) -&gt;</span><span> String </span><span style="color:#cdd6f4;">{
+</span><span>        </span><span style="color:#3577e8;">let</span><span> n </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> n</span><span style="color:#cdd6f4;">.</span><span>parse</span><span style="color:#cdd6f4;">::&lt;</span><span style="color:#3577e8;">u128</span><span style="color:#cdd6f4;">&gt;().</span><span style="color:#2f72e6;">unwrap</span><span style="color:#cdd6f4;">();
+</span><span>        </span><span style="color:#3577e8;">let mut</span><span> temp </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#cdd6f4;">(</span><span>n </span><span style="font-weight:bold;color:#74c7ec;">+ </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">) </span><span style="font-weight:bold;color:#74c7ec;">/ </span><span style="color:#fab387;">2</span><span style="color:#cdd6f4;">;
+</span><span>        </span><span style="color:#3577e8;">let mut</span><span> t </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">;
+</span><span>        </span><span style="color:#3577e8;">let mut</span><span> found </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#eba0ac;">false</span><span style="color:#cdd6f4;">;
+</span><span>        </span><span style="font-style:italic;color:#bac2de;">// approximate log base 2
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">while</span><span> temp </span><span style="font-weight:bold;color:#74c7ec;">&gt; </span><span style="color:#fab387;">1 </span><span style="color:#cdd6f4;">{
+</span><span>            temp </span><span style="font-weight:bold;color:#74c7ec;">/= </span><span style="color:#fab387;">2</span><span style="color:#cdd6f4;">;
+</span><span>            t </span><span style="font-weight:bold;color:#74c7ec;">+= </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">;
+</span><span>        </span><span style="color:#cdd6f4;">}
+</span><span>        </span><span style="color:#3577e8;">let mut</span><span> k </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#cdd6f4;">((</span><span>n </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">f64</span><span style="color:#cdd6f4;">).</span><span style="color:#2f72e6;">powf</span><span style="color:#cdd6f4;">(</span><span style="color:#fab387;">1.0 </span><span style="font-weight:bold;color:#74c7ec;">/</span><span> t </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">f64</span><span style="color:#cdd6f4;">)).</span><span style="color:#2f72e6;">floor</span><span style="color:#cdd6f4;">() </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">u128</span><span style="color:#cdd6f4;">;
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">while</span><span> t </span><span style="font-weight:bold;color:#74c7ec;">&gt; </span><span style="color:#fab387;">1 </span><span style="color:#cdd6f4;">{
+</span><span>            </span><span style="color:#3577e8;">let</span><span> n_prime </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#cdd6f4;">(</span><span>k</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">pow</span><span style="color:#cdd6f4;">(</span><span>t </span><span style="font-weight:bold;color:#74c7ec;">+ </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">) </span><span style="font-weight:bold;color:#74c7ec;">- </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">) </span><span style="font-weight:bold;color:#74c7ec;">/ </span><span style="color:#cdd6f4;">(</span><span>k </span><span style="font-weight:bold;color:#74c7ec;">- </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">);
+</span><span>            </span><span style="font-weight:bold;color:#3a83e9;">if</span><span> n_prime </span><span style="font-weight:bold;color:#74c7ec;">==</span><span> n </span><span style="color:#cdd6f4;">{
+</span><span>                found </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#eba0ac;">true</span><span style="color:#cdd6f4;">;
+</span><span>                </span><span style="font-weight:bold;color:#3a83e9;">break</span><span style="color:#cdd6f4;">;
+</span><span>            </span><span style="color:#cdd6f4;">} </span><span style="font-weight:bold;color:#3a83e9;">else if</span><span> n_prime </span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span> n </span><span style="color:#cdd6f4;">{
+</span><span>                k </span><span style="font-weight:bold;color:#74c7ec;">-= </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">;
+</span><span>            </span><span style="color:#cdd6f4;">} </span><span style="font-weight:bold;color:#3a83e9;">else </span><span style="color:#cdd6f4;">{
+</span><span>                t </span><span style="font-weight:bold;color:#74c7ec;">-= </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">;
+</span><span>                k </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#cdd6f4;">((</span><span>n </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">f64</span><span style="color:#cdd6f4;">).</span><span style="color:#2f72e6;">powf</span><span style="color:#cdd6f4;">(</span><span style="color:#fab387;">1.0 </span><span style="font-weight:bold;color:#74c7ec;">/</span><span> t </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">f64</span><span style="color:#cdd6f4;">)).</span><span style="color:#2f72e6;">floor</span><span style="color:#cdd6f4;">() </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">u128</span><span style="color:#cdd6f4;">;
+</span><span>            </span><span style="color:#cdd6f4;">}
+</span><span>        </span><span style="color:#cdd6f4;">}
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">if</span><span> found </span><span style="color:#cdd6f4;">{
+</span><span>            k</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">to_string</span><span style="color:#cdd6f4;">()
+</span><span>        </span><span style="color:#cdd6f4;">} </span><span style="font-weight:bold;color:#3a83e9;">else </span><span style="color:#cdd6f4;">{
+</span><span>            </span><span style="color:#cdd6f4;">(</span><span>n</span><span style="font-weight:bold;color:#74c7ec;">-</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">).</span><span style="color:#2f72e6;">to_string</span><span style="color:#cdd6f4;">()
+</span><span>        </span><span style="color:#cdd6f4;">}
+</span><span>    </span><span style="color:#cdd6f4;">}
+</span><span style="color:#cdd6f4;">}
+</span></code></pre>
+
+        </div>
+
+        <div class="date">
+          
+              <time class="dt-published" datetime="2025-02-23T00:00:00Z">
+                  February 23, 2025
+              </time>
+          
+        </div>
+            
+        <div class="tag">
+          
+              
+                  <a class="u-category" href="https://faulty.carboxi.de/tags/algorithm/">algorithm</a>
+              
+                  <a class="u-category" href="https://faulty.carboxi.de/tags/a-problem-a-day/">a-problem-a-day</a>
+              
+          
+        </div>
+    </div>
+</div>
+
+<div class="spacing"><div>
+
+
+
+
+
+
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+
+
+
+
+
+
+  <section class="next">
+      <h2>Wondering?</h2>
+      <div><p>Maybe explore my <a href="/tags">tags</a> & archives and send me a <a href="https://indieweb.org/Webmention">webmention</a>. Follow the site using <a href="https://faulty.carboxi.de/rss.xml">RSS</a>. Just roam arount a bit.</p></div>
+  </section>
+
+
+<div class="spacing"><div>
+
+<section>
+  
+  
+  
+  
+  
+
+  <div>
+    <h3>Posts from February 2025</h3>
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/aproblemaday5/">A problem a day: Day 5</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-25">
+            25<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/aproblemaday4/">A problem a day: Day 4</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-24">
+            24<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+          
+        
+        <article class="listing latest-month-post current-post">
+          <a href="https://faulty.carboxi.de/aproblemaday3/">A problem a day: Day 3</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-23">
+            23<sup>rd</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+          
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/aproblemaday2/">A problem a day: Day 2</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-22">
+            22<sup>nd</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/aproblemaday/">A problem a day: Day 1</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-20">
+            20<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/hello/">Hello</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-08">
+            8<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/about/">About Me</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-05">
+            5<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+    
+  </div>
+
+
+  
+  <details class="previous-months-accordion">
+    <summary>Archives</summary>
+    
+    
+    
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2026</span>
+              
+            
+            
+              <span class="month-header">February</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/quit/">I Quit.</a>
+          <span class="separator"></span>
+          <time datetime="2026-02-28">
+            28<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2025</span>
+              
+            
+            
+              <span class="month-header">November</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/x86-64-assembly-part-1-5/">Into the x86_64 land Part 1.5: Memory Layout of Struct</a>
+          <span class="separator"></span>
+          <time datetime="2025-11-28">
+            28<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/x86-64-assembly-part-1/">Into the x86_64 land</a>
+          <span class="separator"></span>
+          <time datetime="2025-11-06">
+            6<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">July</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+          
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/organizationandmanagement/">Organization and Management</a>
+          <span class="separator"></span>
+          <time datetime="2025-07-21">
+            21<sup>st</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/whatsgoingon/">Whats Going On</a>
+          <span class="separator"></span>
+          <time datetime="2025-07-15">
+            15<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">April</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/goingallin/">Going All In</a>
+          <span class="separator"></span>
+          <time datetime="2025-04-10">
+            10<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">March</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+          
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/horror/">I Love Horror Movies</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-23">
+            23<sup>rd</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/learning/">I love learning things.</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-09">
+            9<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/adhd/">I Do Have Mouth, and Still I Can&#x27;t Scream</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-07">
+            7<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2014</span>
+              
+            
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/one/">Template</a>
+          <span class="separator"></span>
+          <time datetime="2014-03-14">
+            14<sup>th</sup>
+          </time>
+        </article>
+      
+    
+  </details>
+</section>
+
+
+</body>
+
+<footer>
+  
+  <p>
+  <a href="/" >Main</a>
+  <a href="/rss.xml">Feed</a>
+  <a href="/author" >Author</a>
+  <a href="/nexus" >Nexus</a>
+  <a href="/now" >Now</a>
+  </p>
+  
+</footer>
+</html>

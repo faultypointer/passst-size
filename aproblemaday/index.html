@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="utf-8">
+    <title>faulty:carboxide</title>
+    <link rel="stylesheet" href="/style.css">
+
+    <link rel="webmention" href="https://webmention.io/faulty.carboxi.de/webmention" />
+
+    
+      <link rel="alternate" type="application/rss+xml" title="RSS" href="https://faulty.carboxi.de/rss.xml">
+    
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 85%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23a1a1a1%22>⌬</text></svg>">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+              // customised options
+              // • auto-render specific keys, e.g.:
+              delimiters: [
+                  {left: '$$', right: '$$', display: true},
+                  {left: '$', right: '$', display: false},
+                  {left: '\\(', right: '\\)', display: false},
+                  {left: '\\[', right: '\\]', display: true}
+              ],
+              // • rendering keys, e.g.:
+              throwOnError : false
+            });
+        });
+    </script>
+</head>
+
+<body>
+    
+
+
+
+
+
+
+
+<div>
+    <div class="h-entry">
+
+    
+  <div class="p-author h-card" style="display: none;">
+    <a class="u-url" href="https:&#x2F;&#x2F;faulty.carboxi.de" rel="me">
+      <a class="u-email" href="mailto:faultypointer@proton.me" rel="me">
+      <img class="u-photo" src="&#x2F;thumbnail.png" alt="faulty">
+      <span class="p-name">faulty</span>
+      <p class="p-note">book</p>
+    </a>
+  </div>
+
+
+    <h1 class="p-name"><a href="https:&#x2F;&#x2F;faulty.carboxi.de">A problem a day: Day 1</a></h1>
+        <a class="u-url" href="https:&#x2F;&#x2F;faulty.carboxi.de&#x2F;aproblemaday&#x2F;" style="display: none;"></a>
+        <div class="e-content p-content">
+          
+            <h2 id="origin">Origin</h2>
+<p>url: <a href="https://leetcode.com/problems/minimum-money-required-before-transactions/description/">Leetcode: Problem no. 2412</a></p>
+<h3 id="problem">Problem</h3>
+<p>You are given a <strong>0-indexed</strong> 2D integer array <code>transactions</code>, where <code>transactions[i] = [costi, cashbacki]</code>.</p>
+<p>The array describes transactions, where each transaction must be completed exactly once in <strong>some order</strong>. At any given moment, you have a certain amount of <code>money</code>. In order to complete transaction <code>i</code>, <code>money &gt;= costi</code> must hold true. After performing a transaction, <code>money</code> becomes <code>money - costi + cashbacki</code>.</p>
+<p>Return <em>the minimum amount of</em> <code>money</code> <em>required before any transaction so that all of the transactions can be completed <strong>regardless of the order</strong> of the transactions.</em></p>
+<h3 id="examples">Examples</h3>
+<p><strong>Input:</strong> transactions = [ [2,1],[5,0],[4,2] ]
+<strong>Output:</strong> 10
+<strong>Explanation:</strong>
+Starting with money = 10, the transactions can be performed in any order.
+It can be shown that starting with money &lt; 10 will fail to complete all transactions in some order.</p>
+<p><strong>Input:</strong> transactions = [ [3,0],[0,3] ]
+<strong>Output:</strong> 3
+<strong>Explanation:</strong></p>
+<ul>
+<li>If transactions are in the order [ [3,0],[0,3] ], the minimum money required to complete the transactions is 3.</li>
+<li>If transactions are in the order [ [0,3],[3,0] ], the minimum money required to complete the transactions is 0.
+Thus, starting with money = 3, the transactions can be performed in any order.</li>
+</ul>
+<h3 id="constraints">Constraints</h3>
+<ul>
+<li>1 &lt;= transactions.length &lt;= $10^5$</li>
+<li>transactions[i].length == 2</li>
+<li>$0 &lt;= cost_i, cashback_i &lt;= 10^9$</li>
+</ul>
+<h2 id="journey">Journey</h2>
+<h3 id="sorting">Sorting</h3>
+<p>if i sort the outer array based on the cash back in ascending order, the order I get will require the most money initially(I think).
+It certainly works on the examples.</p>
+<p>Lets see
+for transactions of [ [4, 1], [3, 3], [5, 7], [9, 2] ]
+when sorted in ascending order of cashback
+sorted transaction = [ [4, 1], [9, 2], [3, 3], [5, 7] ]
+so minimum required cost: x - 4 + 1 - 9 + 2 - 3 + 3 - 5 = 0; x =  15</p>
+<p>after calculating the money for all the permutations of the above transactions</p>
+<pre style="background-color:#0b0b0b;color:#eaf0f5;"><code><span>[0]: ([4, 1], [3, 3], [5, 7], [9, 2]) initial money:  10
+</span><span>[1]: ([4, 1], [3, 3], [9, 2], [5, 7]) initial money:  15
+</span><span>[2]: ([4, 1], [5, 7], [3, 3], [9, 2]) initial money:  10
+</span><span>[3]: ([4, 1], [5, 7], [9, 2], [3, 3]) initial money:  11
+</span><span>[4]: ([4, 1], [9, 2], [3, 3], [5, 7]) initial money:  15
+</span><span>[5]: ([4, 1], [9, 2], [5, 7], [3, 3]) initial money:  11
+</span><span>[6]: ([3, 3], [4, 1], [5, 7], [9, 2]) initial money:  10
+</span><span>[7]: ([3, 3], [4, 1], [9, 2], [5, 7]) initial money:  15
+</span><span>[8]: ([3, 3], [5, 7], [4, 1], [9, 2]) initial money:  10
+</span><span>[9]: ([3, 3], [5, 7], [9, 2], [4, 1]) initial money:  9
+</span><span>[10]: ([3, 3], [9, 2], [4, 1], [5, 7]) initial money:  15
+</span><span>[11]: ([3, 3], [9, 2], [5, 7], [4, 1]) initial money:  9
+</span><span>[12]: ([5, 7], [4, 1], [3, 3], [9, 2]) initial money:  10
+</span><span>[13]: ([5, 7], [4, 1], [9, 2], [3, 3]) initial money:  11
+</span><span>[14]: ([5, 7], [3, 3], [4, 1], [9, 2]) initial money:  10
+</span><span>[15]: ([5, 7], [3, 3], [9, 2], [4, 1]) initial money:  9
+</span><span>[16]: ([5, 7], [9, 2], [4, 1], [3, 3]) initial money:  11
+</span><span>[17]: ([5, 7], [9, 2], [3, 3], [4, 1]) initial money:  9
+</span><span>[18]: ([9, 2], [4, 1], [3, 3], [5, 7]) initial money:  15
+</span><span>[19]: ([9, 2], [4, 1], [5, 7], [3, 3]) initial money:  11
+</span><span>[20]: ([9, 2], [3, 3], [4, 1], [5, 7]) initial money:  15
+</span><span>[21]: ([9, 2], [3, 3], [5, 7], [4, 1]) initial money:  9
+</span><span>[22]: ([9, 2], [5, 7], [4, 1], [3, 3]) initial money:  11
+</span><span>[23]: ([9, 2], [5, 7], [3, 3], [4, 1]) initial money:  9
+</span></code></pre>
+<p>The minimum amount of money for any order of transaction is 15 from the above results. Now 15 is returned by many orderings 1, 4, 7, 18, and 20. I don't know if this means my algorithm is correct or not but I'm gonna try it.</p>
+<p>This sorting approach is fundamentally flawed but I'm gonna list some of the problems I thought there were with the approach that led me to the actual solution.</p>
+<p>First the obvious one. The maximum initial money required could be at any point during the series of transactions and not only at the end. (I didn't think why when I was solving it last night., it was very late, otherwise I think I would have reached the solution sooner)
+Okay so I should keep a maximum money that variable and update it only when money is greater than current maximum money. (again should have just thought for a moment why I needed to do this instead of running through hoops to make the solution work)</p>
+<p>So I have the maximum initial money that I need throughout the transactions. This is it, right? Wrong. What about the ones where the cost is 0. Then the transaction is basically giving free cashback no matter if its smaller than the others. (I hadn't clocked it still but I'm getting there) I should just keep these transactions with zero cost at the end so that they don't affect the maximum_money.</p>
+<p>"Okay hopefully it works now, I need to sleep" is what I thought but of course it doesn't and it didn't. Then I became aware of the third type of transactions in this whole thing. The transactions where cost is not 0 but some positive value but the cashback is still greater than cost so  it also decreases the maximum  initial money required and thus should be push to the last.</p>
+<p>I had one final go where I put the transaction  with maximum cost among the negative (negative cost - cashback) at the front of those transactions. It still didn't work.</p>
+<h3 id="difference">Difference</h3>
+<p>And then I realized I didn't need to sort the transactions in the first place. Since only the transactions with the positive (in terms of cost) result mattered, I could find the sum of the positive transactions. Since I would have to pay the cost of transaction and then I got the cashback, if I added the highest cashback to that positive sum, then that is the minimum amount of money initially  to complete all of the transactions.</p>
+<p><strong>If</strong> the transactions where cost is less than cashback didn't exist, which practically shouldn't but the problem constraint  $0 &lt;= cost_i, cashback_i &lt;= 10^9$ doesn't say anything about that. So the last step of the positive sum is to negate the effect of the highest cashback since I don't get it until I pay the cost of that transaction.</p>
+<p>Now I should include it in if the highest cost among the negative transactions(where cashback &gt; cost) is greater than highest cashback. This lead me to the solution below.</p>
+<pre data-lang="rust" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#3577e8;">impl </span><span>Solution </span><span style="color:#cdd6f4;">{
+</span><span>    </span><span style="color:#3577e8;">pub fn </span><span style="color:#2f72e6;">minimum_money</span><span style="color:#cdd6f4;">(transactions: </span><span style="color:#f9e2af;">Vec</span><span style="color:#cdd6f4;">&lt;</span><span style="color:#f9e2af;">Vec</span><span style="color:#cdd6f4;">&lt;</span><span style="color:#3577e8;">i32</span><span style="color:#cdd6f4;">&gt;&gt;) -&gt; </span><span style="color:#3577e8;">i64 </span><span style="color:#cdd6f4;">{
+</span><span>        </span><span style="color:#3577e8;">let mut</span><span> positive_sum</span><span style="color:#cdd6f4;">: </span><span style="color:#3577e8;">i32 </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> transactions</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">iter</span><span style="color:#cdd6f4;">()
+</span><span>            </span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">map</span><span style="color:#cdd6f4;">(|transaction| </span><span>transaction</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">-</span><span> transaction</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">])
+</span><span>            </span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">filter</span><span style="color:#cdd6f4;">(|</span><span style="font-weight:bold;color:#74c7ec;">&amp;</span><span style="color:#cdd6f4;">diff| </span><span>diff </span><span style="font-weight:bold;color:#74c7ec;">&gt; </span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">)
+</span><span>            </span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">sum</span><span style="color:#cdd6f4;">();
+</span><span>        </span><span style="color:#3577e8;">let mut</span><span> highest_neg </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">;
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">for</span><span> tran </span><span style="font-weight:bold;color:#74c7ec;">in &amp;</span><span>transactions </span><span style="color:#cdd6f4;">{
+</span><span>            </span><span style="font-weight:bold;color:#3a83e9;">if</span><span> tran</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">&lt;</span><span> tran</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">&amp;&amp;</span><span> tran</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span> highest_neg </span><span style="color:#cdd6f4;">{
+</span><span>                highest_neg </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> tran</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">];
+</span><span>            </span><span style="color:#cdd6f4;">}
+</span><span>        </span><span style="color:#cdd6f4;">}
+</span><span>        </span><span style="color:#3577e8;">let mut</span><span> highest_cashback_index </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">;
+</span><span>        </span><span style="color:#3577e8;">let mut</span><span> highest_cashback </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">;
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">for </span><span style="color:#cdd6f4;">(</span><span>i</span><span style="color:#cdd6f4;">,</span><span> tran</span><span style="color:#cdd6f4;">) </span><span style="font-weight:bold;color:#74c7ec;">in</span><span> transactions</span><span style="color:#cdd6f4;">.</span><span style="color:#2f72e6;">iter</span><span style="color:#cdd6f4;">().</span><span style="color:#2f72e6;">enumerate</span><span style="color:#cdd6f4;">() {
+</span><span>            </span><span style="font-weight:bold;color:#3a83e9;">if </span><span style="color:#cdd6f4;">(</span><span>tran</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span> tran</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">&amp;&amp;</span><span> highest_cashback </span><span style="font-weight:bold;color:#74c7ec;">&lt;</span><span> tran</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">]) {
+</span><span>                highest_cashback </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> tran</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">];
+</span><span>                highest_cashback_index </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> i</span><span style="color:#cdd6f4;">;
+</span><span>            </span><span style="color:#cdd6f4;">}
+</span><span>        </span><span style="color:#cdd6f4;">}
+</span><span>
+</span><span>        </span><span style="font-weight:bold;color:#3a83e9;">if</span><span> highest_cashback </span><span style="font-weight:bold;color:#74c7ec;">&lt;</span><span> highest_neg </span><span style="color:#cdd6f4;">{
+</span><span>            </span><span style="color:#cdd6f4;">(</span><span>positive_sum</span><span style="font-weight:bold;color:#74c7ec;">+</span><span>highest_neg</span><span style="color:#cdd6f4;">) </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">i64
+</span><span>        </span><span style="color:#cdd6f4;">} </span><span style="font-weight:bold;color:#3a83e9;">else </span><span style="color:#cdd6f4;">{
+</span><span>            </span><span style="color:#cdd6f4;">(</span><span>positive_sum</span><span style="font-weight:bold;color:#74c7ec;">+</span><span>highest_cashback</span><span style="color:#cdd6f4;">) </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">i64
+</span><span>        </span><span style="color:#cdd6f4;">}
+</span><span>    </span><span style="color:#cdd6f4;">}
+</span><span style="color:#cdd6f4;">}
+</span></code></pre>
+<p>It didn't work because I forgot to factor in the transactions where cost == cashback. It was very late at night so I went to sleep which I couldn't do anyway. I kept thinking about it and not long before I realized about the zero transactions.</p>
+<h2 id="destination">Destination</h2>
+<p>Each transactions can be classified into two types, positive transactions where cost is greater than cashback and negative ones where cost is equal to or less than cash back.</p>
+<p>Let’s just look at the positive transactions for now—where the cost is more than the cashback. Since we always have to pay more than we get back, the minimum amount of money we need keeps going up with each transaction. But since we get the cashback right after each transaction, the order doesn’t really matter—except for the last one.</p>
+<p>The last transaction is different because we need enough money to cover its cost before we get its cashback. So, the worst possible order—the one that makes us need the most money upfront—is when the transaction with the highest cashback is saved for last. If we got that cashback earlier, it would’ve helped lower the amount of money we needed. But by putting it last, we miss out on that advantage, making us start with more money to complete every transactions.</p>
+<p>For negative transactions, we only need to consider the one with the highest cost. Any other negative transaction would give more cashback than it costs, meaning it would actually reduce the amount of money we need upfront.</p>
+<p>If $M_p$ is the minimum money required for the positive transactions, then adding the most expensive negative transaction with cost $C_n$ means we also need to complete the last positive transaction. Completing the last positive transaction gives us its maximum cashback, $B_p$.</p>
+<p>So, the initial money required in this case would be $M_p + C_n - B_p$. Since we're trying to find the worst-case scenario—the order that requires the most money upfront—we need to check if including this negative transaction actually increases the required money or not. If $C_n$ is greater than $B_p$, it makes the starting money go up, meaning it should be included in the worst case. If not, then we can ignore it because it doesn’t increase the initial money required.</p>
+<p>This is the final solution I came up with. It is in rust.</p>
+<pre data-lang="rust" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#3577e8;">pub fn </span><span style="color:#2f72e6;">minimum_money</span><span style="color:#cdd6f4;">(transactions: </span><span style="color:#f9e2af;">Vec</span><span style="color:#cdd6f4;">&lt;</span><span style="color:#f9e2af;">Vec</span><span style="color:#cdd6f4;">&lt;</span><span style="color:#3577e8;">i32</span><span style="color:#cdd6f4;">&gt;&gt;) -&gt; </span><span style="color:#3577e8;">i64 </span><span style="color:#cdd6f4;">{
+</span><span> </span><span style="color:#3577e8;">let mut</span><span> pos_sum</span><span style="color:#cdd6f4;">: </span><span style="color:#3577e8;">i64 </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">;
+</span><span> </span><span style="color:#3577e8;">let mut</span><span> max_cb </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">;
+</span><span> </span><span style="color:#3577e8;">let mut</span><span> max_neg </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">;
+</span><span> </span><span style="font-weight:bold;color:#3a83e9;">for</span><span> tran </span><span style="font-weight:bold;color:#74c7ec;">in</span><span> transactions </span><span style="color:#cdd6f4;">{
+</span><span>  </span><span style="color:#3577e8;">let</span><span> diff </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> tran</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">] </span><span style="font-weight:bold;color:#74c7ec;">-</span><span> tran</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">];
+</span><span>  </span><span style="font-weight:bold;color:#3a83e9;">if </span><span style="color:#cdd6f4;">(</span><span>diff </span><span style="font-weight:bold;color:#74c7ec;">&gt; </span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">) {
+</span><span>   pos_sum </span><span style="font-weight:bold;color:#74c7ec;">+=</span><span> diff </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">i64</span><span style="color:#cdd6f4;">;
+</span><span>   </span><span style="font-weight:bold;color:#3a83e9;">if</span><span> max_cb </span><span style="font-weight:bold;color:#74c7ec;">&lt;</span><span> tran</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">] {
+</span><span>    max_cb </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> tran</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">];
+</span><span>   </span><span style="color:#cdd6f4;">}
+</span><span>  </span><span style="color:#cdd6f4;">} </span><span style="font-weight:bold;color:#3a83e9;">else </span><span style="color:#cdd6f4;">{
+</span><span>   </span><span style="font-weight:bold;color:#3a83e9;">if</span><span> max_neg </span><span style="font-weight:bold;color:#74c7ec;">&lt;</span><span> tran</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">] {
+</span><span>    max_neg </span><span style="font-weight:bold;color:#74c7ec;">=</span><span> tran</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">];
+</span><span>   </span><span style="color:#cdd6f4;">}
+</span><span>  </span><span style="color:#cdd6f4;">}
+</span><span> </span><span style="color:#cdd6f4;">}
+</span><span>
+</span><span> </span><span style="font-weight:bold;color:#3a83e9;">if</span><span> max_cb </span><span style="font-weight:bold;color:#74c7ec;">&lt;</span><span> max_neg </span><span style="color:#cdd6f4;">{
+</span><span>  pos_sum</span><span style="font-weight:bold;color:#74c7ec;">+</span><span>max_neg </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">i64
+</span><span> </span><span style="color:#cdd6f4;">} </span><span style="font-weight:bold;color:#3a83e9;">else </span><span style="color:#cdd6f4;">{
+</span><span>  pos_sum</span><span style="font-weight:bold;color:#74c7ec;">+</span><span>max_cb </span><span style="font-weight:bold;color:#74c7ec;">as </span><span style="color:#3577e8;">i64
+</span><span> </span><span style="color:#cdd6f4;">}
+</span><span style="color:#cdd6f4;">}
+</span></code></pre>
+
+        </div>
+
+        <div class="date">
+          
+              <time class="dt-published" datetime="2025-02-20T00:00:00Z">
+                  February 20, 2025
+              </time>
+          
+        </div>
+            
+        <div class="tag">
+          
+              
+                  <a class="u-category" href="https://faulty.carboxi.de/tags/algorithm/">algorithm</a>
+              
+                  <a class="u-category" href="https://faulty.carboxi.de/tags/a-problem-a-day/">a-problem-a-day</a>
+              
+          
+        </div>
+    </div>
+</div>
+
+<div class="spacing"><div>
+
+
+
+
+
+
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+
+
+
+
+
+
+  <section class="next">
+      <h2>Wondering?</h2>
+      <div><p>Maybe explore my <a href="/tags">tags</a> & archives and send me a <a href="https://indieweb.org/Webmention">webmention</a>. Follow the site using <a href="https://faulty.carboxi.de/rss.xml">RSS</a>. Just roam arount a bit.</p></div>
+  </section>
+
+
+<div class="spacing"><div>
+
+<section>
+  
+  
+  
+  
+  
+
+  <div>
+    <h3>Posts from February 2025</h3>
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/aproblemaday5/">A problem a day: Day 5</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-25">
+            25<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/aproblemaday4/">A problem a day: Day 4</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-24">
+            24<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+          
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/aproblemaday3/">A problem a day: Day 3</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-23">
+            23<sup>rd</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+          
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/aproblemaday2/">A problem a day: Day 2</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-22">
+            22<sup>nd</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post current-post">
+          <a href="https://faulty.carboxi.de/aproblemaday/">A problem a day: Day 1</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-20">
+            20<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/hello/">Hello</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-08">
+            8<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/about/">About Me</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-05">
+            5<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+    
+  </div>
+
+
+  
+  <details class="previous-months-accordion">
+    <summary>Archives</summary>
+    
+    
+    
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2026</span>
+              
+            
+            
+              <span class="month-header">February</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/quit/">I Quit.</a>
+          <span class="separator"></span>
+          <time datetime="2026-02-28">
+            28<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2025</span>
+              
+            
+            
+              <span class="month-header">November</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/x86-64-assembly-part-1-5/">Into the x86_64 land Part 1.5: Memory Layout of Struct</a>
+          <span class="separator"></span>
+          <time datetime="2025-11-28">
+            28<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/x86-64-assembly-part-1/">Into the x86_64 land</a>
+          <span class="separator"></span>
+          <time datetime="2025-11-06">
+            6<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">July</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+          
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/organizationandmanagement/">Organization and Management</a>
+          <span class="separator"></span>
+          <time datetime="2025-07-21">
+            21<sup>st</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/whatsgoingon/">Whats Going On</a>
+          <span class="separator"></span>
+          <time datetime="2025-07-15">
+            15<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">April</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/goingallin/">Going All In</a>
+          <span class="separator"></span>
+          <time datetime="2025-04-10">
+            10<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">March</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+          
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/horror/">I Love Horror Movies</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-23">
+            23<sup>rd</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/learning/">I love learning things.</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-09">
+            9<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/adhd/">I Do Have Mouth, and Still I Can&#x27;t Scream</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-07">
+            7<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2014</span>
+              
+            
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/one/">Template</a>
+          <span class="separator"></span>
+          <time datetime="2014-03-14">
+            14<sup>th</sup>
+          </time>
+        </article>
+      
+    
+  </details>
+</section>
+
+
+</body>
+
+<footer>
+  
+  <p>
+  <a href="/" >Main</a>
+  <a href="/rss.xml">Feed</a>
+  <a href="/author" >Author</a>
+  <a href="/nexus" >Nexus</a>
+  <a href="/now" >Now</a>
+  </p>
+  
+</footer>
+</html>

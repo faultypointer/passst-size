@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="utf-8">
+    <title>faulty:carboxide</title>
+    <link rel="stylesheet" href="/style.css">
+
+    <link rel="webmention" href="https://webmention.io/faulty.carboxi.de/webmention" />
+
+    
+      <link rel="alternate" type="application/rss+xml" title="RSS" href="https://faulty.carboxi.de/rss.xml">
+    
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 85%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23a1a1a1%22>⌬</text></svg>">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+              // customised options
+              // • auto-render specific keys, e.g.:
+              delimiters: [
+                  {left: '$$', right: '$$', display: true},
+                  {left: '$', right: '$', display: false},
+                  {left: '\\(', right: '\\)', display: false},
+                  {left: '\\[', right: '\\]', display: true}
+              ],
+              // • rendering keys, e.g.:
+              throwOnError : false
+            });
+        });
+    </script>
+</head>
+
+<body>
+    
+
+
+
+
+
+
+
+<div>
+    <div class="h-entry">
+
+    
+  <div class="p-author h-card" style="display: none;">
+    <a class="u-url" href="https:&#x2F;&#x2F;faulty.carboxi.de" rel="me">
+      <a class="u-email" href="mailto:faultypointer@proton.me" rel="me">
+      <img class="u-photo" src="&#x2F;thumbnail.png" alt="faulty">
+      <span class="p-name">faulty</span>
+      <p class="p-note">book</p>
+    </a>
+  </div>
+
+
+    <h1 class="p-name"><a href="https:&#x2F;&#x2F;faulty.carboxi.de">Into the x86_64 land Part 1.5: Memory Layout of Struct</a></h1>
+        <a class="u-url" href="https:&#x2F;&#x2F;faulty.carboxi.de&#x2F;x86-64-assembly-part-1-5&#x2F;" style="display: none;"></a>
+        <div class="e-content p-content">
+          
+            <h2 id="alignment">Alignment</h2>
+<p>A memory address <code>a</code> is said to be <code>n</code>-byte aligned if it is divisible by <code>n</code>. For example, write a c program like so:</p>
+<pre data-lang="c" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-c "><code class="language-c" data-lang="c"><span style="font-weight:bold;color:#3a83e9;">#include </span><span style="color:#cdd6f4;">&lt;</span><span style="color:#a6e3a1;">stdio.h</span><span style="color:#cdd6f4;">&gt;
+</span><span style="font-weight:bold;color:#3a83e9;">#include </span><span style="color:#cdd6f4;">&lt;</span><span style="color:#a6e3a1;">stdlib.h</span><span style="color:#cdd6f4;">&gt;
+</span><span>
+</span><span style="color:#3577e8;">int </span><span style="color:#2f72e6;">main</span><span style="color:#cdd6f4;">() {
+</span><span>    </span><span style="color:#3577e8;">double </span><span style="font-weight:bold;color:#74c7ec;">*</span><span>d </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#cdd6f4;">(</span><span style="color:#3577e8;">double </span><span style="font-weight:bold;color:#74c7ec;">*</span><span style="color:#cdd6f4;">)</span><span style="color:#2f72e6;">malloc</span><span style="color:#cdd6f4;">(</span><span style="font-weight:bold;color:#74c7ec;">sizeof</span><span style="color:#cdd6f4;">(</span><span style="color:#3577e8;">double</span><span style="color:#cdd6f4;">));
+</span><span>    </span><span style="color:#2f72e6;">printf</span><span style="color:#cdd6f4;">(&quot;</span><span style="color:#a6e3a1;">Address: </span><span style="color:#eba0ac;">%p\n</span><span style="color:#cdd6f4;">&quot;,</span><span style="color:#2f72e6;"> d</span><span style="color:#cdd6f4;">);
+</span><span>    </span><span style="font-weight:bold;color:#3a83e9;">return </span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">;
+</span><span style="color:#cdd6f4;">}
+</span></code></pre>
+<p>If you compile and run this program, you will get an address like <code>0x561d3a642310</code>. This number is divisible by 1, 2, 4, 8 and 16 as well. It is not divisible by 32 tho. So the address is 16-byte aligned, 8 byte aligned, etc but not 32 byte aligned.</p>
+<p>Based on this, there are two ways of accessing data from memory.</p>
+<p>An aligned data access is one where the data being accessed is n-byte in size located at the address <code>a</code> which is n-byte aligned (i.e <code>a</code> is divisible by <code>n</code>).</p>
+<p>The other kind of access is Misaligned data accesses where n-byte data is accessed from address that is not n-byte aligned.</p>
+<h2 id="okay-who-cares">Okay. Who cares?</h2>
+<p>Your compilers care and so does the cpu and so should you.</p>
+<p>The processor doesn't access the memory in byte size, it access the memory in a fixed size chunks (like 2-byte, 4-byte, 8-byte, 32-byte or even 64-byte) called memory access granularity.</p>
+<p>With an unaligned memory access, you can run into problems such as poor performance, program crashes, needing to restart your machine, memory corruption etc.
+You can check <a href="https://developer.ibm.com/articles/pa-dalign/">this article</a> for more detail. The article also describes the layout of a structure in memory so you don't even have to come back to this blog.</p>
+<h2 id="array">Array</h2>
+<p>How are elements in array located in memory? Let's write a simple c program.</p>
+<pre data-lang="c" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-c "><code class="language-c" data-lang="c"><span style="font-weight:bold;color:#3a83e9;">#include </span><span style="color:#cdd6f4;">&lt;</span><span style="color:#a6e3a1;">stdio.h</span><span style="color:#cdd6f4;">&gt;
+</span><span>
+</span><span style="color:#3577e8;">int </span><span style="color:#2f72e6;">main</span><span style="color:#cdd6f4;">() {
+</span><span>    </span><span style="color:#3577e8;">double</span><span> arr</span><span style="color:#cdd6f4;">[] </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#cdd6f4;">{</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">.</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">, </span><span style="color:#fab387;">2</span><span style="color:#cdd6f4;">.</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">, </span><span style="color:#fab387;">3</span><span style="color:#cdd6f4;">.</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">, </span><span style="color:#fab387;">4</span><span style="color:#cdd6f4;">.</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">, </span><span style="color:#fab387;">5</span><span style="color:#cdd6f4;">.</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">};
+</span><span>    </span><span style="color:#2f72e6;">printf</span><span style="color:#cdd6f4;">(&quot;</span><span style="color:#a6e3a1;">Address of arr: </span><span style="color:#eba0ac;">%p\n</span><span style="color:#cdd6f4;">&quot;, </span><span style="font-weight:bold;color:#74c7ec;">&amp;</span><span style="color:#2f72e6;">arr</span><span style="color:#cdd6f4;">);
+</span><span>    </span><span style="color:#2f72e6;">printf</span><span style="color:#cdd6f4;">(&quot;</span><span style="color:#a6e3a1;">Address of first element arr: </span><span style="color:#eba0ac;">%p\n</span><span style="color:#cdd6f4;">&quot;, </span><span style="font-weight:bold;color:#74c7ec;">&amp;</span><span style="color:#2f72e6;">arr</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">]);
+</span><span>    </span><span style="color:#2f72e6;">printf</span><span style="color:#cdd6f4;">(&quot;</span><span style="color:#a6e3a1;">Address of second element arr: </span><span style="color:#eba0ac;">%p\n</span><span style="color:#cdd6f4;">&quot;, </span><span style="font-weight:bold;color:#74c7ec;">&amp;</span><span style="color:#2f72e6;">arr</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">]);
+</span><span>    </span><span style="color:#2f72e6;">printf</span><span style="color:#cdd6f4;">(&quot;</span><span style="color:#a6e3a1;">Address of third element arr: </span><span style="color:#eba0ac;">%p\n</span><span style="color:#cdd6f4;">&quot;, </span><span style="font-weight:bold;color:#74c7ec;">&amp;</span><span style="color:#2f72e6;">arr</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">2</span><span style="color:#cdd6f4;">]);
+</span><span>    </span><span style="color:#2f72e6;">printf</span><span style="color:#cdd6f4;">(&quot;</span><span style="color:#a6e3a1;">Address of forth element arr: </span><span style="color:#eba0ac;">%p\n</span><span style="color:#cdd6f4;">&quot;, </span><span style="font-weight:bold;color:#74c7ec;">&amp;</span><span style="color:#2f72e6;">arr</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">3</span><span style="color:#cdd6f4;">]);
+</span><span>    </span><span style="color:#2f72e6;">printf</span><span style="color:#cdd6f4;">(&quot;</span><span style="color:#a6e3a1;">Address of last element arr: </span><span style="color:#eba0ac;">%p\n</span><span style="color:#cdd6f4;">&quot;, </span><span style="font-weight:bold;color:#74c7ec;">&amp;</span><span style="color:#2f72e6;">arr</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">4</span><span style="color:#cdd6f4;">]);
+</span><span>    </span><span style="color:#2f72e6;">printf</span><span style="color:#cdd6f4;">(&quot;</span><span style="color:#a6e3a1;">Size of array: </span><span style="color:#eba0ac;">%ld\n</span><span style="color:#cdd6f4;">&quot;, </span><span style="font-weight:bold;color:#74c7ec;">sizeof</span><span style="color:#cdd6f4;">(</span><span style="color:#2f72e6;">arr</span><span style="color:#cdd6f4;">));
+</span><span>    </span><span style="font-weight:bold;color:#3a83e9;">return </span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">;
+</span><span style="color:#cdd6f4;">}
+</span></code></pre>
+<p>The output:</p>
+<pre data-lang="bash" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of arr: 0x7ffdeac77f50
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of first element arr: 0x7ffdeac77f50
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of second element arr: 0x7ffdeac77f58
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of third element arr: 0x7ffdeac77f60
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of forth element arr: 0x7ffdeac77f68
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of last element arr: 0x7ffdeac77f70
+</span><span style="color:#cdd6f4;">Size</span><span style="color:#2f72e6;"> of array: 40
+</span></code></pre>
+<p>The elements of the array are stored linearly, the next one starting right after the previous one ends. The elements are of type <code>double</code> and thus needs to be 8-byte aligned. The address of <code>arr</code>(and also the address of first element) is infact 8-bytes aligned. The address of the second element is the address of first element + the size of the first element (8), thus it is also 8-byte aligned. It is the case for all the elements of array.</p>
+<p>So if the address of first element (that is starting address of array) is n-byte aligned (n being the size of an element of array), then every element of the array will be n-byte aligned since the address of every element of array is n-byte aligned address + k * n which is an n-byte aligned address.</p>
+<p>This works because the elements of array all have the same type and thus the same size.</p>
+<p>Let's see what happens when its an struct with different element types.</p>
+<h2 id="struct">Struct</h2>
+<p>Let's define two structs, a function to initialize the struct and a main function to print the address of elements of the struct.</p>
+<pre data-lang="c" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#3577e8;">struct </span><span>Position </span><span style="color:#cdd6f4;">{
+</span><span>    </span><span style="color:#3577e8;">int</span><span> x</span><span style="color:#cdd6f4;">,</span><span> y</span><span style="color:#cdd6f4;">;
+</span><span style="color:#cdd6f4;">};
+</span><span>
+</span><span style="color:#3577e8;">struct </span><span>MoreComplex </span><span style="color:#cdd6f4;">{
+</span><span>    </span><span style="color:#3577e8;">struct</span><span> Position path</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">];
+</span><span>    </span><span style="color:#3577e8;">int</span><span> num</span><span style="color:#cdd6f4;">;
+</span><span>    </span><span style="color:#3577e8;">double</span><span> cost</span><span style="color:#cdd6f4;">;
+</span><span>    </span><span style="color:#3577e8;">bool</span><span> is_first</span><span style="color:#cdd6f4;">;
+</span><span style="color:#cdd6f4;">};
+</span><span>
+</span><span style="color:#3577e8;">struct</span><span> MoreComplex </span><span style="font-weight:bold;color:#74c7ec;">*</span><span style="color:#2f72e6;">struct_layout</span><span style="color:#cdd6f4;">() {
+</span><span>    </span><span style="color:#3577e8;">struct </span><span>MoreComplex *mc =
+</span><span>        (</span><span style="color:#3577e8;">struct</span><span> MoreComplex </span><span style="font-weight:bold;color:#74c7ec;">*</span><span style="text-decoration:underline;font-weight:bold;color:#f38ba8;">)</span><span style="color:#2f72e6;">malloc</span><span style="color:#cdd6f4;">(</span><span style="font-weight:bold;color:#74c7ec;">sizeof</span><span style="color:#cdd6f4;">(</span><span style="color:#3577e8;">struct</span><span style="color:#2f72e6;"> MoreComplex</span><span style="color:#cdd6f4;">));
+</span><span>    mc</span><span style="color:#cdd6f4;">-&gt;</span><span>path</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">].x </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#fab387;">3</span><span style="color:#cdd6f4;">;
+</span><span>    mc</span><span style="color:#cdd6f4;">-&gt;</span><span>path</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">].y </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#fab387;">5</span><span style="color:#cdd6f4;">;
+</span><span>    mc</span><span style="color:#cdd6f4;">-&gt;</span><span>num </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">;
+</span><span>    mc</span><span style="color:#cdd6f4;">-&gt;</span><span>cost </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#fab387;">134</span><span style="color:#cdd6f4;">.</span><span style="color:#fab387;">45</span><span style="color:#cdd6f4;">;
+</span><span>    mc</span><span style="color:#cdd6f4;">-&gt;</span><span>is_first </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#eba0ac;">false</span><span style="color:#cdd6f4;">;
+</span><span>    </span><span style="font-weight:bold;color:#3a83e9;">return</span><span> mc</span><span style="color:#cdd6f4;">;
+</span><span style="color:#cdd6f4;">} 
+</span><span>
+</span><span style="color:#3577e8;">int </span><span style="color:#2f72e6;">main</span><span style="color:#cdd6f4;">() {
+</span><span>    </span><span style="color:#3577e8;">struct</span><span> MoreComplex </span><span style="font-weight:bold;color:#74c7ec;">*</span><span>mc </span><span style="font-weight:bold;color:#74c7ec;">= </span><span style="color:#cdd6f4;">struct_layout();
+</span><span>    </span><span style="color:#2f72e6;">printf</span><span style="color:#cdd6f4;">(&quot;</span><span style="color:#a6e3a1;">Address of mc: </span><span style="color:#eba0ac;">%p\n</span><span style="color:#cdd6f4;">&quot;,</span><span style="color:#2f72e6;"> mc</span><span style="color:#cdd6f4;">);
+</span><span>    </span><span style="color:#2f72e6;">printf</span><span style="color:#cdd6f4;">(&quot;</span><span style="color:#a6e3a1;">Address of mc-&gt;path: </span><span style="color:#eba0ac;">%p\n</span><span style="color:#cdd6f4;">&quot;, </span><span style="font-weight:bold;color:#74c7ec;">&amp;</span><span style="color:#2f72e6;">mc</span><span style="color:#cdd6f4;">-&gt;</span><span style="color:#2f72e6;">path</span><span style="color:#cdd6f4;">);
+</span><span>    </span><span style="color:#2f72e6;">printf</span><span style="color:#cdd6f4;">(&quot;</span><span style="color:#a6e3a1;">Address of first element of mc-&gt;path: </span><span style="color:#eba0ac;">%p\n</span><span style="color:#cdd6f4;">&quot;, </span><span style="font-weight:bold;color:#74c7ec;">&amp;</span><span style="color:#2f72e6;">mc</span><span style="color:#cdd6f4;">-&gt;</span><span style="color:#2f72e6;">path</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">]);
+</span><span>    </span><span style="color:#2f72e6;">printf</span><span style="color:#cdd6f4;">(&quot;</span><span style="color:#a6e3a1;">Address of mc-&gt;path[0].x: </span><span style="color:#eba0ac;">%p\n</span><span style="color:#cdd6f4;">&quot;, </span><span style="font-weight:bold;color:#74c7ec;">&amp;</span><span style="color:#2f72e6;">mc</span><span style="color:#cdd6f4;">-&gt;</span><span style="color:#2f72e6;">path</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">].x);
+</span><span>    </span><span style="color:#2f72e6;">printf</span><span style="color:#cdd6f4;">(&quot;</span><span style="color:#a6e3a1;">Address of mc-&gt;path[0].y: </span><span style="color:#eba0ac;">%p\n</span><span style="color:#cdd6f4;">&quot;, </span><span style="font-weight:bold;color:#74c7ec;">&amp;</span><span style="color:#2f72e6;">mc</span><span style="color:#cdd6f4;">-&gt;</span><span style="color:#2f72e6;">path</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">].y);
+</span><span>    </span><span style="color:#2f72e6;">printf</span><span style="color:#cdd6f4;">(&quot;</span><span style="color:#a6e3a1;">Address of mc-&gt;num: </span><span style="color:#eba0ac;">%p\n</span><span style="color:#cdd6f4;">&quot;, </span><span style="font-weight:bold;color:#74c7ec;">&amp;</span><span style="color:#2f72e6;">mc</span><span style="color:#cdd6f4;">-&gt;</span><span style="color:#2f72e6;">num</span><span style="color:#cdd6f4;">);
+</span><span>    </span><span style="color:#2f72e6;">printf</span><span style="color:#cdd6f4;">(&quot;</span><span style="color:#a6e3a1;">Address of mc-&gt;cost: </span><span style="color:#eba0ac;">%p\n</span><span style="color:#cdd6f4;">&quot;, </span><span style="font-weight:bold;color:#74c7ec;">&amp;</span><span style="color:#2f72e6;">mc</span><span style="color:#cdd6f4;">-&gt;</span><span style="color:#2f72e6;">cost</span><span style="color:#cdd6f4;">);
+</span><span>    </span><span style="color:#2f72e6;">printf</span><span style="color:#cdd6f4;">(&quot;</span><span style="color:#a6e3a1;">Address of mc-&gt;is_first: </span><span style="color:#eba0ac;">%p\n</span><span style="color:#cdd6f4;">&quot;, </span><span style="font-weight:bold;color:#74c7ec;">&amp;</span><span style="color:#2f72e6;">mc</span><span style="color:#cdd6f4;">-&gt;</span><span style="color:#2f72e6;">is_first</span><span style="color:#cdd6f4;">);
+</span><span>    </span><span style="color:#2f72e6;">printf</span><span style="color:#cdd6f4;">(&quot;</span><span style="color:#a6e3a1;">Size of *mc: </span><span style="color:#eba0ac;">%lu\n</span><span style="color:#cdd6f4;">&quot;, </span><span style="font-weight:bold;color:#74c7ec;">sizeof</span><span style="color:#cdd6f4;">(</span><span style="font-weight:bold;color:#74c7ec;">*</span><span style="color:#2f72e6;">mc</span><span style="color:#cdd6f4;">));
+</span><span>    </span><span style="font-weight:bold;color:#3a83e9;">return </span><span style="color:#fab387;">0</span><span style="color:#cdd6f4;">;
+</span><span style="color:#cdd6f4;">}
+</span></code></pre>
+<p>Let's go over the output first.</p>
+<pre data-lang="bash" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc: 0x55c07ebda310
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">path: 0x55c07ebda310
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of first element of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">path: 0x55c07ebda310
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">path</span><span style="font-weight:bold;color:#3a83e9;">[</span><span style="color:#2f72e6;">0</span><span style="font-weight:bold;color:#3a83e9;">]</span><span style="color:#2f72e6;">.x: 0x55c07ebda310
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">path</span><span style="font-weight:bold;color:#3a83e9;">[</span><span style="color:#2f72e6;">0</span><span style="font-weight:bold;color:#3a83e9;">]</span><span style="color:#2f72e6;">.y: 0x55c07ebda314
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">num: 0x55c07ebda318
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">cost: 0x55c07ebda320
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">is_first: 0x55c07ebda328
+</span><span style="color:#cdd6f4;">Size</span><span style="color:#2f72e6;"> of </span><span style="font-weight:bold;color:#74c7ec;">*</span><span style="color:#2f72e6;">mc: 32
+</span></code></pre>
+<p>The first thing we see is that the address of the first field(path) is the same as the address of our struct instant(mc). So like array, struct also doesn't contain any metadata or header information. Because of that the address of field x of first <code>Position</code> in path field of <code>mc</code> is still the same as the address of <code>mc</code> even when its inside a struct which is inside an array which is itself a field of another struct.</p>
+<p>Lets start with the <code>Position</code> struct. The address of its field <code>x</code>, an integer (4-byte aligned) is 0x55...310. The next field of <code>Position</code> is also an integer and its address is also 4-byte aligned as it starts right after the <code>x</code> (4-byte aligned address + 4 byte = 4-byte aligned address).</p>
+<p>The next field of <code>mc</code> is <code>num</code>, an integer, and since it starts right after <code>mc-&gt;path</code> that is the last(and first and only in this case) element of <code>mc.path</code> that is <code>mc-&gt;path[0].y</code>, its address is also 4-byte aligned.</p>
+<p>We finally get to something interesting. The next element is <code>mc-&gt;cost</code>, a double. The address it can be at is 0x55...318 + 4 (size of <code>mc-&gt;num</code>) = 0x55...31c. But it doesnt start at 0x55...31c it starts at 0x55...320. Why? Because the double is 8-bytes aligned but the address 0x55...31c is not. The next address after 0x55...31c that is 8-byte aligned is 0x55...320.</p>
+<p>The final element <code>mc-&gt;is_first</code> starts where <code>mc-&gt;cost</code> ends, 0x55...328. Since its 1-byte aligned it can start there and it ends at 0x55...329. But it we look at the size of our struct, it ends at 0x55...310 + 0x20(32) = 0x55...330. There is no element after <code>is_first</code> that we need to align. So why do we need the extra 7 bytes at the end of struct.</p>
+<p>Well according to System V ABI, we have the following rules for struct alignment</p>
+<ul>
+<li>Structures assume the alignment of their most strictly aligned component</li>
+<li>The size of any object is always a multiple of the object‘s alignment</li>
+</ul>
+<p>Our struct has an alignment of 8 bytes as that is the largest alignment of any of its element. So its size has to be a multiple of 8.
+0x55...329 - 0x55...310 = 0x19. It is not a multiple of 8. The smallest number larger than 0x19 that is a multiple of 8 is 0x20 or 32 in decimal. Thus we have 32 as the size of our struct.</p>
+<h2 id="packed-struct">Packed Struct</h2>
+<p>We can use the gcc's <code>packed</code> attribute to for the compiler to remove any paddings. Doing this may make the fields of struct unaligned and thus making memory access slower. It maybe beneficial in case of
+embedded systems where size is more of an issue that speed.</p>
+<p>In the above program add the <code>packed</code> attribute to <code>MoreComplex</code> struct like so:</p>
+<pre data-lang="c" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#3577e8;">struct </span><span>MoreComplex </span><span style="color:#cdd6f4;">{
+</span><span>    </span><span style="color:#3577e8;">struct</span><span> Position path</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">];
+</span><span>    </span><span style="color:#3577e8;">int</span><span> num</span><span style="color:#cdd6f4;">;
+</span><span>    </span><span style="color:#3577e8;">double</span><span> cost</span><span style="color:#cdd6f4;">;
+</span><span>    </span><span style="color:#3577e8;">bool</span><span> is_first</span><span style="color:#cdd6f4;">;
+</span><span style="color:#cdd6f4;">} </span><span style="color:#3577e8;">__attribute__</span><span style="color:#cdd6f4;">((</span><span>packed</span><span style="color:#cdd6f4;">));
+</span></code></pre>
+<pre data-lang="bash" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc: 0x55e0f88cd310
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">path: 0x55e0f88cd310
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of first element of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">path: 0x55e0f88cd310
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">path</span><span style="font-weight:bold;color:#3a83e9;">[</span><span style="color:#2f72e6;">0</span><span style="font-weight:bold;color:#3a83e9;">]</span><span style="color:#2f72e6;">.x: 0x55e0f88cd310
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">path</span><span style="font-weight:bold;color:#3a83e9;">[</span><span style="color:#2f72e6;">0</span><span style="font-weight:bold;color:#3a83e9;">]</span><span style="color:#2f72e6;">.y: 0x55e0f88cd314
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">int: 0x55e0f88cd318
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">cost: 0x55e0f88cd31c
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">is_first: 0x55e0f88cd324
+</span><span style="color:#cdd6f4;">Size</span><span style="color:#2f72e6;"> of </span><span style="font-weight:bold;color:#74c7ec;">*</span><span style="color:#2f72e6;">mc: 21
+</span></code></pre>
+<p>As you can see, there are no paddings here.</p>
+<p>If you don't want unaligned memory but still want to save space, you can rearrange the fields of your struct so that the field with highest alignment is first, then element with second highest alignment and so on.</p>
+<p>For example, doing this with our <code>MoreComplex</code> struct,</p>
+<pre data-lang="c" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#3577e8;">struct </span><span>MoreComplex </span><span style="color:#cdd6f4;">{
+</span><span>    </span><span style="color:#3577e8;">double</span><span> cost</span><span style="color:#cdd6f4;">;
+</span><span>    </span><span style="color:#3577e8;">struct</span><span> Position path</span><span style="color:#cdd6f4;">[</span><span style="color:#fab387;">1</span><span style="color:#cdd6f4;">];
+</span><span>    </span><span style="color:#3577e8;">int</span><span> num</span><span style="color:#cdd6f4;">;
+</span><span>    </span><span style="color:#3577e8;">bool</span><span> is_first</span><span style="color:#cdd6f4;">;
+</span><span style="color:#cdd6f4;">};
+</span></code></pre>
+<p>We can save 8 bytes of space without sacrificing the performance.</p>
+<pre data-lang="bash" style="background-color:#0b0b0b;color:#eaf0f5;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc: 0x55b02b517310
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">path: 0x55b02b517318
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of first element of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">path: 0x55b02b517318
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">path</span><span style="font-weight:bold;color:#3a83e9;">[</span><span style="color:#2f72e6;">0</span><span style="font-weight:bold;color:#3a83e9;">]</span><span style="color:#2f72e6;">.x: 0x55b02b517318
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">path</span><span style="font-weight:bold;color:#3a83e9;">[</span><span style="color:#2f72e6;">0</span><span style="font-weight:bold;color:#3a83e9;">]</span><span style="color:#2f72e6;">.y: 0x55b02b51731c
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">int: 0x55b02b517320
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">cost: 0x55b02b517310
+</span><span style="color:#cdd6f4;">Address</span><span style="color:#2f72e6;"> of mc-</span><span style="font-weight:bold;color:#74c7ec;">&gt;</span><span style="color:#2f72e6;">is_first: 0x55b02b517324
+</span><span style="color:#cdd6f4;">Size</span><span style="color:#2f72e6;"> of </span><span style="font-weight:bold;color:#74c7ec;">*</span><span style="color:#2f72e6;">mc: 24
+</span></code></pre>
+<p>With that, I'm off.</p>
+
+        </div>
+
+        <div class="date">
+          
+              <time class="dt-published" datetime="2025-11-28T00:00:00Z">
+                  November 28, 2025
+              </time>
+          
+        </div>
+            
+        <div class="tag">
+          
+              
+                  <a class="u-category" href="https://faulty.carboxi.de/tags/x86-64/">x86_64</a>
+              
+                  <a class="u-category" href="https://faulty.carboxi.de/tags/assembly/">assembly</a>
+              
+                  <a class="u-category" href="https://faulty.carboxi.de/tags/into-x86-64-land/">into-x86_64-land</a>
+              
+          
+        </div>
+    </div>
+</div>
+
+<div class="spacing"><div>
+
+
+
+
+
+
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+    
+    
+        
+    
+    
+    
+      
+    
+
+
+
+
+
+
+
+  <section class="next">
+      <h2>Wondering?</h2>
+      <div><p>Maybe explore my <a href="/tags">tags</a> & archives and send me a <a href="https://indieweb.org/Webmention">webmention</a>. Follow the site using <a href="https://faulty.carboxi.de/rss.xml">RSS</a>. Just roam arount a bit.</p></div>
+  </section>
+
+
+<div class="spacing"><div>
+
+<section>
+  
+  
+  
+  
+  
+  <div>
+    <h2 class="latest-month-header">Latest Posts</h2>
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post">
+          <a href="https://faulty.carboxi.de/quit/">I Quit.</a>
+          <span class="separator"></span>
+          <time datetime="2026-02-28">
+            28<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  
+
+  <div>
+    <h3>Posts from November 2025</h3>
+    
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post current-post">
+          <a href="https://faulty.carboxi.de/x86-64-assembly-part-1-5/">Into the x86_64 land Part 1.5: Memory Layout of Struct</a>
+          <span class="separator"></span>
+          <time datetime="2025-11-28">
+            28<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+        
+        
+        
+        <article class="listing latest-month-post ">
+          <a href="https://faulty.carboxi.de/x86-64-assembly-part-1/">Into the x86_64 land</a>
+          <span class="separator"></span>
+          <time datetime="2025-11-06">
+            6<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+
+
+  
+  <details class="previous-months-accordion">
+    <summary>Archives</summary>
+    
+    
+    
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2026</span>
+              
+            
+            
+              <span class="month-header">February</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/quit/">I Quit.</a>
+          <span class="separator"></span>
+          <time datetime="2026-02-28">
+            28<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2025</span>
+              
+            
+            
+              <span class="month-header">July</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+          
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/organizationandmanagement/">Organization and Management</a>
+          <span class="separator"></span>
+          <time datetime="2025-07-21">
+            21<sup>st</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/whatsgoingon/">Whats Going On</a>
+          <span class="separator"></span>
+          <time datetime="2025-07-15">
+            15<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">April</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/goingallin/">Going All In</a>
+          <span class="separator"></span>
+          <time datetime="2025-04-10">
+            10<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">March</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+          
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/horror/">I Love Horror Movies</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-23">
+            23<sup>rd</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/learning/">I love learning things.</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-09">
+            9<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/adhd/">I Do Have Mouth, and Still I Can&#x27;t Scream</a>
+          <span class="separator"></span>
+          <time datetime="2025-03-07">
+            7<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span></span> 
+            
+            
+              <span class="month-header">February</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/aproblemaday5/">A problem a day: Day 5</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-25">
+            25<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/aproblemaday4/">A problem a day: Day 4</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-24">
+            24<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+          
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/aproblemaday3/">A problem a day: Day 3</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-23">
+            23<sup>rd</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+          
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/aproblemaday2/">A problem a day: Day 2</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-22">
+            22<sup>nd</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/aproblemaday/">A problem a day: Day 1</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-20">
+            20<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/hello/">Hello</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-08">
+            8<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/about/">About Me</a>
+          <span class="separator"></span>
+          <time datetime="2025-02-05">
+            5<sup>th</sup>
+          </time>
+        </article>
+      
+    
+      
+      
+      
+      
+      
+        
+        
+          <div class="date-header">
+            
+              <span class="year-header">2014</span>
+              
+            
+            
+              <span class="month-header">March</span>
+              
+            
+          </div>
+        
+        
+        
+        
+        
+        <article class="listing">
+          <a href="https://faulty.carboxi.de/one/">Template</a>
+          <span class="separator"></span>
+          <time datetime="2014-03-14">
+            14<sup>th</sup>
+          </time>
+        </article>
+      
+    
+  </details>
+</section>
+
+
+</body>
+
+<footer>
+  
+  <p>
+  <a href="/" >Main</a>
+  <a href="/rss.xml">Feed</a>
+  <a href="/author" >Author</a>
+  <a href="/nexus" >Nexus</a>
+  <a href="/now" >Now</a>
+  </p>
+  
+</footer>
+</html>
