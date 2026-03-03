@@ -3,7 +3,7 @@
   "useStaticFolder": true,
   "staticDir": "static",
   "assetsDir": "assets",
-  "postTemplate": "+++\n+++\ntitle = \"{{title}}\"\ndate ={{date}}\n[taxonomies]\ntags = []\n+++\n\n+++\n\n",
+  "postTemplate": "+++\ntitle = \"{{title}}\"\ndate ={{date}}\n[taxonomies]\ntags = []\n+++\n",
   "siteUrl": "",
   "showAdvancedFiles": true,
   "syncSettingsToGitHub": true
