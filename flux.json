@@ -1,0 +1,10 @@
+{
+  "contentDir": "content",
+  "useStaticFolder": true,
+  "staticDir": "static",
+  "assetsDir": "assets",
+  "postTemplate": "+++\ntitle: {{title}}\ndate: {{date}}\ntime: {{time}}\n+++\n\n",
+  "siteUrl": "",
+  "showAdvancedFiles": true,
+  "syncSettingsToGitHub": true
+}
