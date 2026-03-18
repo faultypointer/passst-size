@@ -6,5 +6,6 @@
   "postTemplate": "+++\ntitle = \"{{title}}\"\ndate ={{date}}\n[taxonomies]\ntags = []\n+++\n",
   "siteUrl": "",
   "showAdvancedFiles": true,
-  "syncSettingsToGitHub": true
+  "syncSettingsToGitHub": true,
+  "sortBy": "recency"
 }
